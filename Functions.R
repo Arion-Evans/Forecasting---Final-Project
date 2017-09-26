@@ -1,3 +1,16 @@
+library(forecast)
+library(expsmooth)
+library(TSA)
+library(dynlm)
+library(x12)
+library(Hmisc)
+library(car)
+library(AER)
+library(dLagM)
+library(knitr) 
+library(scales)
+
+
 expSmooth <- function(ts) {
   # array to store models
   models <- list()
@@ -27,7 +40,7 @@ expSmooth <- function(ts) {
     ts_add <- ts + add_value
     lambda <- BoxCox.lambda(ts_add, method = "loglik")
     bc <- BoxCox(ts_add,lambda)
-    if(bc>1e7){
+    if(max(bc)>1e7){
       scale <- max(bc)/1e6
       bc <- bc/scale
     }
