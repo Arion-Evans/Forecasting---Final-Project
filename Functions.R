@@ -76,22 +76,22 @@ expSmooth <- function(ts) {
   count <- 1
   
     for(j in 1:length(ts.neg.list)){
-      model <- holt(ts.neg.list[[j]], damped = TRUE, exponential = FALSE)
+      model <- try(holt(ts.neg.list[[j]], damped = TRUE, exponential = FALSE), silent = TRUE)
       models[[count]] <- model
       model.info[count,"ID"] <- count
-      model.info[count,"MASE"] <- accuracy(model$model)[1,"MASE"]
-      model.info[count,"Shapiro-Wilks"] <- shapiro.test(model$model$residuals)$p.value
+      model.info[count,"MASE"] <- try(accuracy(model$model)[1,"MASE"], silent = TRUE)
+      model.info[count,"Shapiro-Wilks"] <- try(shapiro.test(model$model$residuals)$p.value, silent = TRUE)
       model.info[count,"Series Used"] <- ts.type[j]
       model.info[count,"Lambda"] <- lambda.array[j]
       model.info[count,"Added Value"] <- added.value.neg[j]
       
       count <- count + 1
       
-      model <- ses(ts.neg.list[[j]])
+      model <- try(ses(ts.neg.list[[j]]), silent = TRUE)
       models[[count]] <- model
       model.info[count,"ID"] <- count
-      model.info[count,"MASE"] <- accuracy(model$model)[1,"MASE"]
-      model.info[count,"Shapiro-Wilks"] <- shapiro.test(model$model$residuals)$p.value
+      model.info[count,"MASE"] <- try(accuracy(model$model)[1,"MASE"], silent = TRUE)
+      model.info[count,"Shapiro-Wilks"] <- try(shapiro.test(model$model$residuals)$p.value, silent = TRUE)
       model.info[count,"Series Used"] <- ts.type[j]
       model.info[count,"Lambda"] <- lambda.array[j]
       model.info[count,"Added Value"] <- added.value.neg[j]
@@ -103,22 +103,22 @@ expSmooth <- function(ts) {
     for(i in 1:2){
       for(j in 1:length(ts.pos.list)){
       if(exponential[i] == TRUE){
-        model <- holt(ts.pos.list[[j]], damped = FALSE, exponential = exponential[i])
+        model <- try(holt(ts.pos.list[[j]], damped = FALSE, exponential = exponential[i]), silent = TRUE)
         models[[count]] <- model
         model.info[count,"ID"] <- count
-        model.info[count,"MASE"] <- accuracy(model$model)[1,"MASE"]
-        model.info[count,"Shapiro-Wilks"] <- shapiro.test(model$model$residuals)$p.value
+        model.info[count,"MASE"] <- try(accuracy(model$model)[1,"MASE"], silent = TRUE)
+        model.info[count,"Shapiro-Wilks"] <- try(shapiro.test(model$model$residuals)$p.value, silent = TRUE)
         model.info[count,"Series Used"] <- ts.type[j]
         model.info[count,"Lambda"] <- lambda.array[j]
         model.info[count,"Added Value"] <- added.value.pos[j]
         
         count <- count + 1
       }else{
-        model <- holt(ts.neg.list[[j]], damped = FALSE, exponential = exponential[i])
+        model <- try(holt(ts.neg.list[[j]], damped = FALSE, exponential = exponential[i]), silent = TRUE)
         models[[count]] <- model
         model.info[count,"ID"] <- count
-        model.info[count,"MASE"] <- accuracy(model$model)[1,"MASE"]
-        model.info[count,"Shapiro-Wilks"] <- shapiro.test(model$model$residuals)$p.value
+        model.info[count,"MASE"] <- try(accuracy(model$model)[1,"MASE"], silent = TRUE)
+        model.info[count,"Shapiro-Wilks"] <- try(shapiro.test(model$model$residuals)$p.value, silent = TRUE)
         model.info[count,"Series Used"] <- ts.type[j]
         model.info[count,"Lambda"] <- lambda.array[j]
         model.info[count,"Added Value"] <- added.value.neg[j]
@@ -127,12 +127,12 @@ expSmooth <- function(ts) {
       }
       
       
-      model <- hw(ts.neg.list[[j]], damped = damped[i], exponential = FALSE, 
-                  seasonal = "additive")
+      model <- try(hw(ts.neg.list[[j]], damped = damped[i], exponential = FALSE, 
+                  seasonal = "additive"), silent = TRUE)
       models[[count]] <- model
       model.info[count,"ID"] <- count
-      model.info[count,"MASE"] <- accuracy(model$model)[1,"MASE"]
-      model.info[count,"Shapiro-Wilks"] <- shapiro.test(model$model$residuals)$p.value
+      model.info[count,"MASE"] <- try(accuracy(model$model)[1,"MASE"], silent = TRUE)
+      model.info[count,"Shapiro-Wilks"] <- try(shapiro.test(model$model$residuals)$p.value, silent = TRUE)
       model.info[count,"Series Used"] <- ts.type[j]
       model.info[count,"Lambda"] <- lambda.array[j]
       model.info[count,"Added Value"] <- added.value.neg[j]
@@ -148,12 +148,12 @@ expSmooth <- function(ts) {
   for(i in 1:nrow(expand.de)){
     for(j in 1:length(ts.pos.list)){
       
-        model <- hw(ts.pos.list[[j]], damped = expand.de[i,1], exponential = expand.de[i,2], 
-                    seasonal = "multiplicative")
+        model <- try(hw(ts.pos.list[[j]], damped = expand.de[i,1], exponential = expand.de[i,2], 
+                    seasonal = "multiplicative"), silent = TRUE)
         models[[count]] <- model
         model.info[count,"ID"] <- count
-        model.info[count,"MASE"] <- accuracy(model$model)[1,"MASE"]
-        model.info[count,"Shapiro-Wilks"] <- shapiro.test(model$model$residuals)$p.value
+        model.info[count,"MASE"] <- try(accuracy(model$model)[1,"MASE"], silent = TRUE)
+        model.info[count,"Shapiro-Wilks"] <- try(shapiro.test(model$model$residuals)$p.value, silent = TRUE)
         model.info[count,"Series Used"] <- ts.type[j]
         model.info[count,"Lambda"] <- lambda.array[j]
         model.info[count,"Added Value"] <- added.value.pos[j]
@@ -168,24 +168,24 @@ expSmooth <- function(ts) {
   for(i in 1:nrow(expand.mob)){
     for(j in 1:length(ts.pos.list)){
       if(grepl("M",expand.mob[i,1])){
-        model <- ets(ts.pos.list[[j]],model = expand.mob[i,1], opt.crit = expand.mob[i,2],
-                     bounds = expand.mob[i,3])
+        model <- try(ets(ts.pos.list[[j]],model = expand.mob[i,1], opt.crit = expand.mob[i,2],
+                     bounds = expand.mob[i,3]), silent = TRUE)
         models[[count]] <- model
         model.info[count,"ID"] <- count
-        model.info[count,"MASE"] <- accuracy(model)[1,"MASE"]
-        model.info[count,"Shapiro-Wilks"] <- shapiro.test(model$residuals)$p.value
+        model.info[count,"MASE"] <- try(accuracy(model)[1,"MASE"], silent = TRUE)
+        model.info[count,"Shapiro-Wilks"] <- try(shapiro.test(model$residuals)$p.value, silent = TRUE)
         model.info[count,"Series Used"] <- ts.type[j]
         model.info[count,"Lambda"] <- lambda.array[j]
         model.info[count,"Added Value"] <- added.value.pos[j]
         
         count <- count + 1
       }else{
-        model <- ets(ts.neg.list[[j]],model = expand.mob[i,1], opt.crit = expand.mob[i,2],
-                     bounds = expand.mob[i,3])
+        model <- try(ets(ts.neg.list[[j]],model = expand.mob[i,1], opt.crit = expand.mob[i,2],
+                     bounds = expand.mob[i,3]), silent = TRUE)
         models[[count]] <- model
         model.info[count,"ID"] <- count
-        model.info[count,"MASE"] <- accuracy(model)[1,"MASE"]
-        model.info[count,"Shapiro-Wilks"] <- shapiro.test(model$residuals)$p.value
+        model.info[count,"MASE"] <- try(accuracy(model)[1,"MASE"], silent = TRUE)
+        model.info[count,"Shapiro-Wilks"] <- try(shapiro.test(model$residuals)$p.value, silent = TRUE)
         model.info[count,"Series Used"] <- ts.type[j]
         model.info[count,"Lambda"] <- lambda.array[j]
         model.info[count,"Added Value"] <- added.value.neg[j]
@@ -202,24 +202,24 @@ expSmooth <- function(ts) {
   for(i in 1:nrow(expand.mdob)){
     for(j in 1:length(ts.pos.list)){
       if(grepl("M",expand.mdob[i,1])){
-        model <- ets(ts.pos.list[[j]],model = expand.mdob[i,1], damped = expand.mdob[i,2], 
-                     bounds = expand.mdob[i,4])
+        model <- try(ets(ts.pos.list[[j]],model = expand.mdob[i,1], damped = expand.mdob[i,2], 
+                     bounds = expand.mdob[i,4]), silent = TRUE)
         models[[count]] <- model
         model.info[count,"ID"] <- count
-        model.info[count,"MASE"] <- accuracy(model)[1,"MASE"]
-        model.info[count,"Shapiro-Wilks"] <- shapiro.test(model$residuals)$p.value
+        model.info[count,"MASE"] <- try(accuracy(model)[1,"MASE"], silent = TRUE)
+        model.info[count,"Shapiro-Wilks"] <- try(shapiro.test(model$residuals)$p.value, silent = TRUE)
         model.info[count,"Series Used"] <- ts.type[j]
         model.info[count,"Lambda"] <- lambda.array[j]
         model.info[count,"Added Value"] <- added.value.pos[j]
         
         count <- count + 1
       }else{
-        model <- ets(ts.neg.list[[j]],model = expand.mdob[i,1], damped = expand.mdob[i,2], 
-                     bounds = expand.mdob[i,4])
+        model <- try(ets(ts.neg.list[[j]],model = expand.mdob[i,1], damped = expand.mdob[i,2], 
+                     bounds = expand.mdob[i,4]), silent = TRUE)
         models[[count]] <- model
         model.info[count,"ID"] <- count
-        model.info[count,"MASE"] <- accuracy(model)[1,"MASE"]
-        model.info[count,"Shapiro-Wilks"] <- shapiro.test(model$residuals)$p.value
+        model.info[count,"MASE"] <- try(accuracy(model)[1,"MASE"], silent = TRUE)
+        model.info[count,"Shapiro-Wilks"] <- try(shapiro.test(model$residuals)$p.value, silent = TRUE)
         model.info[count,"Series Used"] <- ts.type[j]
         model.info[count,"Lambda"] <- lambda.array[j]
         model.info[count,"Added Value"] <- added.value.neg[j]
