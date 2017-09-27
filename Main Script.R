@@ -49,8 +49,8 @@ for(i in 1:nrow(monthly)){
   fit <- expSmooth(series95)
   models.monthly[[i]] <- fit[[1]]
   model.info.monthly[[i]] <- fit[[2]]
-  MASE.monthly[i] <- model.info.monthly[[i]]["MASE"]
-  shapiro.monthly[i] <- model.info.monthly[[i]]["Shapiro-Wilks"]
+  MASE.monthly[i] <- model.info.monthly[[i]][,"MASE"]
+  shapiro.monthly[i] <- model.info.monthly[[i]][,"Shapiro-Wilks"]
   
   # forecasts
   forecasts <- forecast(models.monthly[[i]], h = length(series05))$mean
@@ -60,7 +60,7 @@ for(i in 1:nrow(monthly)){
     forecasts <- forecasts - model.info.monthly[[i]][,"Added Value"]
   }
   if(model.info.monthly[[i]][,"Series Used"] == "Box-Cox"){
-    forecasts <- invBoxCox(forecasts, model.info.monthly[[i]]["Lambda"]) - model.info.monthly[[i]][,"Added Value"]
+    forecasts <- invBoxCox(forecasts, model.info.monthly[[i]][,"Lambda"]) - model.info.monthly[[i]][,"Added Value"]
   }
   if(model.info.monthly[[i]][,"Series Used"] == "1st Difference"){
     comb <- ts.union(diff(series95) , forecasts - model.info.monthly[[i]][,"Added Value"])
@@ -111,8 +111,8 @@ for(i in 1:nrow(quarterly)){
   fit <- expSmooth(series95)
   models.quarterly[[i]] <- fit[[1]]
   model.info.quarterly[[i]] <- fit[[2]]
-  MASE.quarterly[i] <- model.info.quarterly[[i]]["MASE"]
-  shapiro.quarterly[i] <- model.info.quarterly[[i]]["Shapiro-Wilks"]
+  MASE.quarterly[i] <- model.info.quarterly[[i]][,"MASE"]
+  shapiro.quarterly[i] <- model.info.quarterly[[i]][,"Shapiro-Wilks"]
   
   # forecasts
   forecasts <- forecast(models.quarterly[[i]], h = length(series05))$mean
@@ -122,7 +122,7 @@ for(i in 1:nrow(quarterly)){
     forecasts <- forecasts - model.info.quarterly[[i]][,"Added Value"]
   }
   if(model.info.quarterly[[i]][,"Series Used"] == "Box-Cox"){
-    forecasts <- invBoxCox(forecasts, model.info.quarterly[[i]]["Lambda"]) - model.info.quarterly[[i]][,"Added Value"]
+    forecasts <- invBoxCox(forecasts, model.info.quarterly[[i]][,"Lambda"]) - model.info.quarterly[[i]][,"Added Value"]
   }
   if(model.info.quarterly[[i]][,"Series Used"] == "1st Difference"){
     comb <- ts.union(diff(series95) , forecasts - model.info.quarterly[[i]][,"Added Value"])
@@ -167,8 +167,8 @@ for(i in 1:nrow(yearly)){
   fit <- expSmooth(series95)
   models.yearly[[i]] <- fit[[1]]
   model.info.yearly[[i]] <- fit[[2]]
-  MASE.yearly[i] <- model.info.yearly[[i]]["MASE"]
-  shapiro.yearly[i] <- model.info.yearly[[i]]["Shapiro-Wilks"]
+  MASE.yearly[i] <- model.info.yearly[[i]][,"MASE"]
+  shapiro.yearly[i] <- model.info.yearly[[i]][,"Shapiro-Wilks"]
   
   # forecasts
   forecasts <- forecast(models.yearly[[i]], h = length(series05))$mean
@@ -178,7 +178,7 @@ for(i in 1:nrow(yearly)){
     forecasts <- forecasts - model.info.yearly[[i]][,"Added Value"]
   }
   if(model.info.yearly[[i]][,"Series Used"] == "Box-Cox"){
-    forecasts <- invBoxCox(forecasts, model.info.yearly[[i]]["Lambda"]) - model.info.yearly[[i]][,"Added Value"]
+    forecasts <- invBoxCox(forecasts, model.info.yearly[[i]][,"Lambda"]) - model.info.yearly[[i]][,"Added Value"]
   }
   if(model.info.yearly[[i]][,"Series Used"] == "1st Difference"){
     comb <- ts.union(diff(series95) , forecasts - model.info.yearly[[i]][,"Added Value"])
