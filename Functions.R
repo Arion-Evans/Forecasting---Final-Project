@@ -293,3 +293,30 @@ expSmooth <- function(ts) {
   return(result)
   
 }
+
+
+MASE.custom <- function(observed , fitted ){ 
+  
+  Y.t = observed 
+  n = length(fitted) 
+  e.t = Y.t - fitted 
+  sum = 0  
+  
+  for (i in 2:n){   
+    sum = sum + abs(Y.t[i] - Y.t[i-1] ) 
+  } 
+  
+  q.t = e.t / (sum/(n-1)) 
+  MASE = mean(abs(q.t))  
+  
+  return(list(MASE = MASE))
+}
+
+invBoxCox <- function(x, lambda){
+  if (lambda == 0){
+    exp(x)
+  }else{
+    (lambda*x + 1)^(1/lambda)
+  } 
+}
+  
