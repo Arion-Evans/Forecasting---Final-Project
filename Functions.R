@@ -229,15 +229,27 @@ expSmooth <- function(ts) {
       
     }
   }
- 
-  # extracting models with best MASE and residuals
+  
+  # formatting array
   model.info <- as.data.frame(model.info)
   model.info <- model.info[complete.cases(model.info),]
   model.info[, c(1:3,5:6)] <- sapply(model.info[, c(1:3,5:6)], as.character)
   model.info[, c(1:3,5:6)] <- sapply(model.info[, c(1:3,5:6)], as.numeric)
   colnames(model.info) <- c("ID","MASE","Shapiro-Wilks","Series Used","Lambda","Added Value")
+  
+  # best MASE model
   best.MASE.info <- model.info[order(model.info[,"MASE"]),][1,]
-  best.shapiro.info <- model.info[order(model.info[,"Shapiro-Wilks"]),][nrow(model.info),]
+  
+  # models with more than 0.5 shapiro p-value
+  best.residual.models <- model.info[model.info[,"Shapiro-Wilks"] > 0.5,]
+  
+  # select best shapiro/MASE combo
+  if(nrow(best.residual.models) > 0){
+    best.shapiro.info <- best.residual.models[order(best.residual.models[,"MASE"]),][1,]
+  }else{
+    best.shapiro.info <- model.info[order(model.info[,"Shapiro-Wilks"]),][nrow(model.info),]
+  }
+  
   
   if(best.MASE.info[,"Shapiro-Wilks"] > 0.05){
     best.model <- models[[best.MASE.info[,"ID"]]]
