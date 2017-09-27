@@ -21,7 +21,7 @@ MASE.monthly <- array()
 shapiro.monthly <- array()
 models.monthly <- list()
 model.info.monthly <- list()
-MASE.frc.monthly <- list()
+MASE.frc.monthly <- array()
 
 # monthly loop
 freq <- 12
@@ -75,7 +75,7 @@ for(i in 1:nrow(monthly)){
     forecasts = window(back.series,start = start(series05))
   }
   
-  MASE.frc.monthly[i] <- MASE.custom(series05, forecasts)
+  MASE.frc.monthly[i] <- as.numeric(MASE.custom(series05, forecasts))
   
   
 }
@@ -85,7 +85,7 @@ MASE.quarterly <- array()
 shapiro.quarterly <- array()
 models.quarterly <- list()
 model.info.quarterly <- list()
-MASE.frc.quarterly <- list()
+MASE.frc.quarterly <- array()
 
 # quarterly loop
 freq <- 4
@@ -137,7 +137,7 @@ for(i in 1:nrow(quarterly)){
     forecasts = window(back.series,start = start(series05))
   }
   
-  MASE.frc.quarterly[i] <- MASE.custom(series05, forecasts)
+  MASE.frc.quarterly[i] <- as.numeric(MASE.custom(series05, forecasts))
 }
 
 #  objects to store results (yearly)
@@ -145,7 +145,7 @@ MASE.yearly <- array()
 shapiro.yearly <- array()
 models.yearly <- list()
 model.info.yearly <- list()
-MASE.frc.yearly <- list()
+MASE.frc.yearly <- array()
 
 # yearly loop
 freq = 1
@@ -193,7 +193,7 @@ for(i in 1:nrow(yearly)){
     forecasts = window(back.series,start = start(series05))
   }
   
-  MASE.frc.yearly[i] <- MASE.custom(series05, forecasts)
+  MASE.frc.yearly[i] <- as.numeric(MASE.custom(series05, forecasts))
 }
 
 # Results
@@ -202,9 +202,9 @@ colnames(results) <- c("Mean Model MASE","Mean Forecast MASE","Mean Shapiro")
 results[1,1] <- mean(MASE.monthly)
 results[2,1] <- mean(MASE.quarterly)
 results[3,1] <- mean(MASE.yearly)
-results[1,2] <- mean(unlist(MASE.frc.monthly))
-results[2,2] <- mean(unlist(MASE.frc.quarterly))
-results[3,2] <- mean(unlist(MASE.frc.yearly))
+results[1,2] <- mean(MASE.frc.monthly)
+results[2,2] <- mean(MASE.frc.quarterly)
+results[3,2] <- mean(MASE.frc.yearly)
 results[1,3] <- mean(shapiro.monthly)
 results[2,3] <- mean(shapiro.quarterly)
 results[3,3] <- mean(shapiro.yearly)
