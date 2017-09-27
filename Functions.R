@@ -241,28 +241,34 @@ expSmooth <- function(ts) {
   best.MASE.info <- model.info[order(model.info[,"MASE"]),][1,]
   
   # models with more than 0.5 shapiro p-value
-  best.residual.models <- model.info[model.info[,"Shapiro-Wilks"] > 0.5,]
+  best.residual.models <- model.info[model.info[,"Shapiro-Wilks"] > 0.4,]
+  best.residual.models <- best.residual.models[complete.cases(best.residual.models),]
   
   # select best shapiro/MASE combo
   if(nrow(best.residual.models) > 0){
     best.shapiro.info <- best.residual.models[order(best.residual.models[,"MASE"]),][1,]
   }else{
-    best.shapiro.info <- model.info[order(model.info[,"Shapiro-Wilks"]),][nrow(model.info),]
+    best.shapiro.info <- model.info[order(-model.info[,"Shapiro-Wilks"]),][1,]
   }
   
+  MASE.diff <- best.shapiro.info[,"MASE"] - best.MASE.info[,"MASE"]
+  shapiro.diff <- best.shapiro.info[,"Shapiro-Wilks"] - best.MASE.info[,"Shapiro-Wilks"]
   
-  if(best.MASE.info[,"Shapiro-Wilks"] > 0.05){
+  if(best.MASE.info[,"Shapiro-Wilks"] > 0.5){
     best.model <- models[[best.MASE.info[,"ID"]]]
     best.model.info <- best.MASE.info
   }else if(best.shapiro.info[,"Shapiro-Wilks"] < 0.05){
     best.model <- models[[best.MASE.info[,"ID"]]]
     best.model.info <- best.MASE.info
-  }else if((best.shapiro.info[,"MASE"] - best.MASE.info[,"MASE"]) > 0.05){
+  }else if(MASE.diff > 0.05){
     best.model <- models[[best.MASE.info[,"ID"]]]
     best.model.info <- best.MASE.info
-  }else{
+  }else if((MASE.diff < 0.02) && (shapiro.diff > 0.1)){
     best.model <- models[[best.shapiro.info[,"ID"]]]
     best.model.info <- best.shapiro.info
+  }else{
+    best.model <- models[[best.MASE.info[,"ID"]]]
+    best.model.info <- best.MASE.info
   }
   
   result <- list(best.model, best.model.info)
