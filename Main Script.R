@@ -16,9 +16,18 @@ quarterly <- read.csv("C:/Users/Arion/Desktop/Uni/Forecasting/Final Project/Quar
 yearly <- read.csv("C:/Users/Arion/Desktop/Uni/Forecasting/Final Project/Yearly.csv")   
 
 
+#  objects to store results (monthly)
+MASE.monthly <- array()
+shapiro.monthly <- array()
+models.monthly <- list()
+model.info.monthly <- list()
+MASE.frc.monthly <- array()
+
 # monthly loop
 freq <- 12
 for(i in 1:nrow(monthly)){
+  
+  # converting to ts objects leaving at least 2 observations in the remaider series
   if(0.05*monthly$N[i]<2){
     series95 <- ts(as.vector(t(as.matrix(monthly[i,7:(monthly$N[i]+4)]))),
                    start = c(monthly$Starting.Year[i], monthly$Starting.Month[i]),
@@ -35,7 +44,33 @@ for(i in 1:nrow(monthly)){
                    start=end(series95)+c(0,1), 
                    frequency = freq)
   }
+  
+  # model fitting
+  fit <- expSmooth(series95)
+  models.monthly[[i]] <- fit[[1]]
+  model.info.monthly[[i]] <- fit[[2]]
+  MASE.monthly[i] <- model.info.monthly[[i]]["MASE"]
+  shapiro.monthly[i] <- model.info.monthly[[i]]["Shapiro-Wilks"]
+  
+  # forecasts
+  forecasts <- forecast(models.monthly[[i]], h = length(series05))$mean
+  
+  # reversing transformations
+  if(model.info.monthly[[i]]["Transformed"]){
+    forecasts <- invBoxCox(forecasts, model.info.monthly[[i]]["Lambda"])
+  }
+  
+  MASE.frc.monthly[i] <- MASE.custom(series05, forecasts)
+  
+  
 }
+
+#  objects to store results (quarterly)
+MASE.quarterly <- array()
+shapiro.quarterly <- array()
+models.quarterly <- list()
+model.info.quarterly <- list()
+MASE.frc.quarterly <- array()
 
 # quarterly loop
 freq <- 4
@@ -56,7 +91,31 @@ for(i in 1:nrow(quarterly)){
                    start=end(series95)+c(0,1), 
                    frequency = freq)
   }
+  
+  # model fitting
+  fit <- expSmooth(series95)
+  models.quarterly[[i]] <- fit[[1]]
+  model.info.quarterly[[i]] <- fit[[2]]
+  MASE.quarterly[i] <- model.info.quarterly[[i]]["MASE"]
+  shapiro.quarterly[i] <- model.info.quarterly[[i]]["Shapiro-Wilks"]
+  
+  # forecasts
+  forecasts <- forecast(models.quarterly[[i]], h = length(series05))$mean
+  
+  # reversing transformations
+  if(model.info.quarterly[[i]]["Transformed"]){
+    forecasts <- invBoxCox(forecasts, model.info.quarterly[[i]]["Lambda"])
+  }
+  
+  MASE.frc.quarterly[i] <- MASE.custom(series05, forecasts)
 }
+
+#  objects to store results (yearly)
+MASE.yearly <- array()
+shapiro.yearly <- array()
+models.yearly <- list()
+model.info.yearly <- list()
+MASE.frc.yearly <- array()
 
 # yearly loop
 
@@ -73,42 +132,38 @@ for(i in 1:nrow(yearly)){
     series05 <- ts(as.vector(t(as.matrix(yearly[i,(round(0.95*yearly$N[i])+7):(yearly$N[i]+6)]))),
                    start=end(series95)+c(1,0))
   }
+  
+  # model fitting
+  fit <- expSmooth(series95)
+  models.yearly[[i]] <- fit[[1]]
+  model.info.yearly[[i]] <- fit[[2]]
+  MASE.yearly[i] <- model.info.yearly[[i]]["MASE"]
+  shapiro.yearly[i] <- model.info.yearly[[i]]["Shapiro-Wilks"]
+  
+  # forecasts
+  forecasts <- forecast(models.yearly[[i]], h = length(series05))$mean
+  
+  # reversing transformations
+  if(model.info.yearly[[i]]["Transformed"]){
+    forecasts <- invBoxCox(forecasts, model.info.yearly[[i]]["Lambda"])
+  }
+  
+  MASE.frc.yearly[i] <- MASE.custom(series05, forecasts)
 }
 
+# Results
+results <- data.frame(matrix(NA, nrow = 3, ncol = 3), row.names = c("Monthly","Quarterly","Yearly"))
+colnames(results) <- c("Mean Model MASE","Mean Forecast MASE","Mean Shapiro")
+results[1,1] <- mean(MASE.monthly)
+results[2,1] <- mean(MASE.quarterly)
+results[3,1] <- mean(MASE.yearly)
+results[1,2] <- mean(MASE.frc.monthly)
+results[2,2] <- mean(MASE.frc.quarterly)
+results[3,2] <- mean(MASE.frc.yearly)
+results[1,3] <- mean(shapiro.monthly)
+results[2,3] <- mean(shapiro.quarterly)
+results[3,3] <- mean(shapiro.yearly)
 
 
 
-# Testing
-series95 <- ts(as.vector(t(as.matrix(quarterly[45,7:(quarterly$N[45]+4)]))),
-               start = c(quarterly$Starting.Year[45], quarterly$Starting.Quarter[45]),
-               frequency = 4)
-series05 <- ts(as.vector(t(as.matrix(quarterly[45,(quarterly$N[45]+5):(quarterly$N[45]+6)]))),
-               start=c((quarterly$Starting.Year[45]+trunc(length(series95)/4)),
-                       (quarterly$Starting.Quarter[45]+(length(series95)%%4)%%4)), 
-               frequency = 4)
-
-series95 <- ts(as.vector(t(as.matrix(monthly[1,7:(round(0.95*monthly$N[1])+6)]))),
-               start=c(monthly$Starting.Year[1],monthly$Starting.Month[1]), 
-               frequency = 12)
-
-series05 <- ts(as.vector(t(as.matrix(monthly[1,(round(0.95*monthly$N[1])+7):(monthly$N[1]+6)]))),
-               start=end(series95)+c(0,8), 
-               frequency = 12)
-
-series95 <- ts(as.vector(t(as.matrix(quarterly[1,7:(round(0.95*quarterly$N[1])+6)]))),
-               start=c(quarterly$Starting.Year[1],quarterly$Starting.Quarter[1]), 
-               frequency = freq)
-
-series05 <- ts(as.vector(t(as.matrix(quarterly[1,(round(0.95*quarterly$N[1])+7):(quarterly$N[1]+6)]))),
-               start=end(series95)+c(0,1), 
-               frequency = freq)
-series04 <- ts(as.vector(t(as.matrix(quarterly[1,(round(0.95*quarterly$N[1])+7):(quarterly$N[1]+6)]))),
-               start=end(series05)+c(0,1), 
-               frequency = freq)
-
-series95 <- ts(as.vector(t(as.matrix(yearly[1,7:(round(0.95*yearly$N[1])+6)]))),
-               start=yearly$Starting.Year[1])
-
-series05 <- ts(as.vector(t(as.matrix(yearly[1,(round(0.95*yearly$N[1])+7):(yearly$N[1]+6)]))),
-               start=end(series95)+c(1,0))
 
