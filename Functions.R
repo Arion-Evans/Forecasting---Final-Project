@@ -193,8 +193,8 @@ expSmooth <- function(ts) {
                      bounds = expand.mob[i,3])
         models[[count]] <- model
         model.info[count,"ID"] <- count
-        model.info[count,"MASE"] <- accuracy(model$model)[1,"MASE"]
-        model.info[count,"Shapiro-Wilks"] <- shapiro.test(model$model$residuals)$p.value
+        model.info[count,"MASE"] <- accuracy(model)[1,"MASE"]
+        model.info[count,"Shapiro-Wilks"] <- shapiro.test(model$residuals)$p.value
         model.info[count,"Added Value"] <- 0
         if(j == 2){
           model.info[count,"Transformed"] <- FALSE
@@ -210,8 +210,8 @@ expSmooth <- function(ts) {
                      bounds = expand.mob[i,3])
         models[[count]] <- model
         model.info[count,"ID"] <- count
-        model.info[count,"MASE"] <- accuracy(model$model)[1,"MASE"]
-        model.info[count,"Shapiro-Wilks"] <- shapiro.test(model$model$residuals)$p.value
+        model.info[count,"MASE"] <- accuracy(model)[1,"MASE"]
+        model.info[count,"Shapiro-Wilks"] <- shapiro.test(model$residuals)$p.value
         model.info[count,"Added Value"] <- 0
         if(j == 1){
           model.info[count,"Transformed"] <- FALSE
@@ -237,8 +237,8 @@ expSmooth <- function(ts) {
                      bounds = expand.mdob[i,4])
         models[[count]] <- model
         model.info[count,"ID"] <- count
-        model.info[count,"MASE"] <- accuracy(model$model)[1,"MASE"]
-        model.info[count,"Shapiro-Wilks"] <- shapiro.test(model$model$residuals)$p.value
+        model.info[count,"MASE"] <- accuracy(model)[1,"MASE"]
+        model.info[count,"Shapiro-Wilks"] <- shapiro.test(model$residuals)$p.value
         model.info[count,"Added Value"] <- 0
         if(j == 2){
           model.info[count,"Transformed"] <- FALSE
@@ -254,8 +254,8 @@ expSmooth <- function(ts) {
                      bounds = expand.mdob[i,4])
         models[[count]] <- model
         model.info[count,"ID"] <- count
-        model.info[count,"MASE"] <- accuracy(model$model)[1,"MASE"]
-        model.info[count,"Shapiro-Wilks"] <- shapiro.test(model$model$residuals)$p.value
+        model.info[count,"MASE"] <- accuracy(model)[1,"MASE"]
+        model.info[count,"Shapiro-Wilks"] <- shapiro.test(model$residuals)$p.value
         model.info[count,"Added Value"] <- 0
         if(j == 1){
           model.info[count,"Transformed"] <- FALSE
