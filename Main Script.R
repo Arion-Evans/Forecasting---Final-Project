@@ -56,8 +56,23 @@ for(i in 1:nrow(monthly)){
   forecasts <- forecast(models.monthly[[i]], h = length(series05))$mean
   
   # reversing transformations
-  if(model.info.monthly[[i]]["Transformed"]){
-    forecasts <- invBoxCox(forecasts, model.info.monthly[[i]]["Lambda"])
+  if(model.info.monthly[[i]][,"Series Used"] == "Original"){
+    forecasts <- forecasts - model.info.monthly[[i]][,"Added Value"]
+  }
+  if(model.info.monthly[[i]][,"Series Used"] == "Box-Cox"){
+    forecasts <- invBoxCox(forecasts, model.info.monthly[[i]]["Lambda"]) - model.info.monthly[[i]][,"Added Value"]
+  }
+  if(model.info.monthly[[i]][,"Series Used"] == "1st Difference"){
+    comb <- ts.union(diff(series95) , forecasts - model.info.monthly[[i]][,"Added Value"])
+    ts.combined.diff  = pmin(comb[,1], comb[,2], na.rm = TRUE)
+    back.series = diffinv(ts.combined.diff, xi = series95[1],lag = 1)
+    forecasts = window(back.series,start = start(series05))
+  }
+  if(model.info.monthly[[i]][,"Series Used"] == "Seasonal Difference"){
+    comb <- ts.union(diff(series95, lag = freq) , forecasts - model.info.monthly[[i]][,"Added Value"])
+    ts.combined.diff  = pmin(comb[,1], comb[,2], na.rm = TRUE)
+    back.series = diffinv(ts.combined.diff, xi = series95[1:freq],lag = freq)
+    forecasts = window(back.series,start = start(series05))
   }
   
   MASE.frc.monthly[i] <- MASE.custom(series05, forecasts)
@@ -103,8 +118,23 @@ for(i in 1:nrow(quarterly)){
   forecasts <- forecast(models.quarterly[[i]], h = length(series05))$mean
   
   # reversing transformations
-  if(model.info.quarterly[[i]]["Transformed"]){
-    forecasts <- invBoxCox(forecasts, model.info.quarterly[[i]]["Lambda"])
+  if(model.info.quarterly[[i]][,"Series Used"] == "Original"){
+    forecasts <- forecasts - model.info.quarterly[[i]][,"Added Value"]
+  }
+  if(model.info.quarterly[[i]][,"Series Used"] == "Box-Cox"){
+    forecasts <- invBoxCox(forecasts, model.info.quarterly[[i]]["Lambda"]) - model.info.quarterly[[i]][,"Added Value"]
+  }
+  if(model.info.quarterly[[i]][,"Series Used"] == "1st Difference"){
+    comb <- ts.union(diff(series95) , forecasts - model.info.quarterly[[i]][,"Added Value"])
+    ts.combined.diff  = pmin(comb[,1], comb[,2], na.rm = TRUE)
+    back.series = diffinv(ts.combined.diff, xi = series95[1],lag = 1)
+    forecasts = window(back.series,start = start(series05))
+  }
+  if(model.info.quarterly[[i]][,"Series Used"] == "Seasonal Difference"){
+    comb <- ts.union(diff(series95, lag = freq) , forecasts - model.info.quarterly[[i]][,"Added Value"])
+    ts.combined.diff  = pmin(comb[,1], comb[,2], na.rm = TRUE)
+    back.series = diffinv(ts.combined.diff, xi = series95[1:freq],lag = freq)
+    forecasts = window(back.series,start = start(series05))
   }
   
   MASE.frc.quarterly[i] <- MASE.custom(series05, forecasts)
@@ -144,8 +174,23 @@ for(i in 1:nrow(yearly)){
   forecasts <- forecast(models.yearly[[i]], h = length(series05))$mean
   
   # reversing transformations
-  if(model.info.yearly[[i]]["Transformed"]){
-    forecasts <- invBoxCox(forecasts, model.info.yearly[[i]]["Lambda"])
+  if(model.info.yearly[[i]][,"Series Used"] == "Original"){
+    forecasts <- forecasts - model.info.yearly[[i]][,"Added Value"]
+  }
+  if(model.info.yearly[[i]][,"Series Used"] == "Box-Cox"){
+    forecasts <- invBoxCox(forecasts, model.info.yearly[[i]]["Lambda"]) - model.info.yearly[[i]][,"Added Value"]
+  }
+  if(model.info.yearly[[i]][,"Series Used"] == "1st Difference"){
+    comb <- ts.union(diff(series95) , forecasts - model.info.yearly[[i]][,"Added Value"])
+    ts.combined.diff  = pmin(comb[,1], comb[,2], na.rm = TRUE)
+    back.series = diffinv(ts.combined.diff, xi = series95[1],lag = 1)
+    forecasts = window(back.series,start = start(series05))
+  }
+  if(model.info.yearly[[i]][,"Series Used"] == "Seasonal Difference"){
+    comb <- ts.union(diff(series95, lag = freq) , forecasts - model.info.yearly[[i]][,"Added Value"])
+    ts.combined.diff  = pmin(comb[,1], comb[,2], na.rm = TRUE)
+    back.series = diffinv(ts.combined.diff, xi = series95[1:freq],lag = freq)
+    forecasts = window(back.series,start = start(series05))
   }
   
   MASE.frc.yearly[i] <- MASE.custom(series05, forecasts)
