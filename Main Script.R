@@ -148,7 +148,7 @@ model.info.yearly <- list()
 MASE.frc.yearly <- array()
 
 # yearly loop
-
+freq = 1
 for(i in 1:nrow(yearly)){
   if(0.05*yearly$N[i]<2){
     series95 <- ts(as.vector(t(as.matrix(yearly[i,7:(yearly$N[i]+4)]))),
