@@ -21,7 +21,7 @@ MASE.monthly <- array()
 shapiro.monthly <- array()
 models.monthly <- list()
 model.info.monthly <- list()
-MASE.frc.monthly <- array()
+MASE.frc.monthly <- list()
 
 # monthly loop
 freq <- 12
@@ -85,7 +85,7 @@ MASE.quarterly <- array()
 shapiro.quarterly <- array()
 models.quarterly <- list()
 model.info.quarterly <- list()
-MASE.frc.quarterly <- array()
+MASE.frc.quarterly <- list()
 
 # quarterly loop
 freq <- 4
@@ -145,7 +145,7 @@ MASE.yearly <- array()
 shapiro.yearly <- array()
 models.yearly <- list()
 model.info.yearly <- list()
-MASE.frc.yearly <- array()
+MASE.frc.yearly <- list()
 
 # yearly loop
 freq = 1
@@ -202,9 +202,9 @@ colnames(results) <- c("Mean Model MASE","Mean Forecast MASE","Mean Shapiro")
 results[1,1] <- mean(MASE.monthly)
 results[2,1] <- mean(MASE.quarterly)
 results[3,1] <- mean(MASE.yearly)
-results[1,2] <- mean(MASE.frc.monthly)
-results[2,2] <- mean(MASE.frc.quarterly)
-results[3,2] <- mean(MASE.frc.yearly)
+results[1,2] <- mean(unlist(MASE.frc.monthly))
+results[2,2] <- mean(unlist(MASE.frc.quarterly))
+results[3,2] <- mean(unlist(MASE.frc.yearly))
 results[1,3] <- mean(shapiro.monthly)
 results[2,3] <- mean(shapiro.quarterly)
 results[3,3] <- mean(shapiro.yearly)
