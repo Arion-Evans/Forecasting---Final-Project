@@ -254,7 +254,7 @@ expSmooth <- function(ts) {
   MASE.diff <- best.shapiro.info[,"MASE"] - best.MASE.info[,"MASE"]
   shapiro.diff <- best.shapiro.info[,"Shapiro-Wilks"] - best.MASE.info[,"Shapiro-Wilks"]
   
-  if(best.MASE.info[,"Shapiro-Wilks"] > 0.5){
+  if(best.MASE.info[,"Shapiro-Wilks"] > 0.4){
     best.model <- models[[best.MASE.info[,"ID"]]]
     best.model.info <- best.MASE.info
   }else if(best.shapiro.info[,"Shapiro-Wilks"] < 0.05){

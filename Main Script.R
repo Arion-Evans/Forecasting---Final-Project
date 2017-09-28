@@ -27,7 +27,7 @@ MASE.frc.monthly <- array()
 freq <- 12
 for(i in 1:nrow(monthly)){
   
-  # converting to ts objects leaving at least 2 observations in the remaider series
+  # converting to ts objects leaving at least 2 observations in the 5% series
   if(0.05*monthly$N[i]<2){
     series95 <- ts(as.vector(t(as.matrix(monthly[i,7:(monthly$N[i]+4)]))),
                    start = c(monthly$Starting.Year[i], monthly$Starting.Month[i]),
@@ -208,7 +208,6 @@ results[3,2] <- mean(MASE.frc.yearly)
 results[1,3] <- mean(shapiro.monthly)
 results[2,3] <- mean(shapiro.quarterly)
 results[3,3] <- mean(shapiro.yearly)
-
 
 
 
