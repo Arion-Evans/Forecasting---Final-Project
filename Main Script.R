@@ -29,14 +29,14 @@ freq <- 12
 for(i in 1:nrow(monthly)){
   
   # converting to ts objects leaving at least 2 observations in the 5% series
-  if((0.05*monthly$N[i]<2) && ((monthly$N[i]+5) == (monthly$N[i]+6))){
+  if((0.05*monthly$N[i]<3) && ((monthly$N[i]+5) == (monthly$N[i]+6))){
     series95.monthly[[i]] <- ts(as.vector(t(as.matrix(monthly[i,7:(monthly$N[i]+3)]))),
                    start = c(monthly$Starting.Year[i], monthly$Starting.Month[i]),
                    frequency = freq)
     series05.monthly[[i]] <- ts(as.vector(t(as.matrix(monthly[i,(monthly$N[i]+4):(monthly$N[i]+6)]))),
                    start=end(series95.monthly[[i]])+c(0,1), 
                    frequency = freq)
-  }else if(0.05*monthly$N[i]<2){
+  }else if(0.05*monthly$N[i]<3){
     series95.monthly[[i]] <- ts(as.vector(t(as.matrix(monthly[i,7:(monthly$N[i]+4)]))),
                    start = c(monthly$Starting.Year[i], monthly$Starting.Month[i]),
                    frequency = freq)
@@ -112,14 +112,14 @@ series05.quarterly <- list()
 # quarterly loop
 freq <- 4
 for(i in 1:nrow(quarterly)){
-  if((0.05*quarterly$N[i]<2) && ((quarterly$N[i]+5) == (quarterly$N[i]+6))){
+  if((0.05*quarterly$N[i]<3) && ((quarterly$N[i]+5) == (quarterly$N[i]+6))){
     series95.quarterly[[i]] <- ts(as.vector(t(as.matrix(quarterly[i,7:(quarterly$N[i]+3)]))),
                    start = c(quarterly$Starting.Year[i], quarterly$Starting.Month[i]),
                    frequency = freq)
     series05.quarterly[[i]] <- ts(as.vector(t(as.matrix(quarterly[i,(quarterly$N[i]+4):(quarterly$N[i]+6)]))),
                    start=end(series95.quarterly[[i]])+c(0,1), 
                    frequency = freq)
-  }else if(0.05*quarterly$N[i]<2){
+  }else if(0.05*quarterly$N[i]<3){
     series95.quarterly[[i]] <- ts(as.vector(t(as.matrix(quarterly[i,7:(quarterly$N[i]+4)]))),
                    start = c(quarterly$Starting.Year[i], quarterly$Starting.Quarter[i]),
                    frequency = freq)
@@ -195,14 +195,14 @@ series05.yearly <- list()
 # yearly loop
 freq = 1
 for(i in 1:nrow(yearly)){
-  if((0.05*yearly$N[i]<2) && ((yearly$N[i]+5) == (yearly$N[i]+6))){
+  if((0.05*yearly$N[i]<3) && ((yearly$N[i]+5) == (yearly$N[i]+6))){
     series95.yearly[[i]] <- ts(as.vector(t(as.matrix(yearly[i,7:(yearly$N[i]+3)]))),
                    start = c(yearly$Starting.Year[i], yearly$Starting.Month[i]),
                    frequency = freq)
     series05.yearly[[i]] <- ts(as.vector(t(as.matrix(yearly[i,(yearly$N[i]+4):(yearly$N[i]+6)]))),
                    start=end(series95.yearly[[i]])+c(0,1), 
                    frequency = freq)
-  }else if(0.05*yearly$N[i]<2){
+  }else if(0.05*yearly$N[i]<3){
     series95.yearly[[i]] <- ts(as.vector(t(as.matrix(yearly[i,7:(yearly$N[i]+4)]))),
                    start = yearly$Starting.Year[i])
     series05.yearly[[i]] <- ts(as.vector(t(as.matrix(yearly[i,(yearly$N[i]+5):(yearly$N[i]+6)]))),
