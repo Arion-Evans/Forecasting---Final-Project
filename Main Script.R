@@ -1,19 +1,10 @@
 library(forecast)
-library(expsmooth)
-library(TSA)
-library(dynlm)
-library(x12)
-library(Hmisc)
-library(car)
-library(AER)
-library(dLagM)
-library(knitr) 
-library(scales)
 
 
-monthly <- read.csv("C:/Users/Arion/Desktop/Uni/Forecasting/Final Project/Monthly.csv")
-quarterly <- read.csv("C:/Users/Arion/Desktop/Uni/Forecasting/Final Project/Quarterly.csv")
-yearly <- read.csv("C:/Users/Arion/Desktop/Uni/Forecasting/Final Project/Yearly.csv")   
+# read data
+monthly <- read.csv("Data/Monthly.csv")
+quarterly <- read.csv("Data/Quarterly.csv")
+yearly <- read.csv("Data/Yearly.csv")   
 
 
 #  objects to store results (monthly)
