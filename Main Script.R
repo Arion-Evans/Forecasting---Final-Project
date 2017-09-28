@@ -223,7 +223,10 @@ for(i in 1:nrow(yearly)){
   shapiro.yearly[i] <- model.info.yearly[[i]][,"Shapiro-Wilks"]
   
   # forecasts
-  forecasts.yearly[[i]] <- forecast(models.yearly[[i]], h = length(series05.yearly[[i]]))$mean
+  forecasts.yearly[[i]] <- tryCatch(forecast(models.yearly[[i]], h = length(series05.yearly[[i]]))$mean,
+                                    error = function(cond){
+                                      return(forecast(ets(series95.yearly[[i]], "ZZZ"), h = length(series05.yearly[[i]]))$mean)
+                                      })
   
   # reversing transformations
   if(model.info.yearly[[i]][,"Series Used"] == "Original"){
