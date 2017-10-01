@@ -5,8 +5,8 @@ expSmooth <- function(ts) {
   # array to store models
   models <- list()
   model.info <- array(NA,
-                      dim = c(1500,6), 
-                      dimnames = list(NULL,c("ID","MASE","Shapiro-Wilks","Series Used","Lambda","Added Value")))
+                      dim = c(1500,7), 
+                      dimnames = list(NULL,c("ID","MASE","Shapiro-Wilks","Ljung-Box","Series Used","Lambda","Added Value")))
   
   # model options
   exponential <- c(TRUE,FALSE)
@@ -71,6 +71,7 @@ expSmooth <- function(ts) {
       model.info[count,"ID"] <- count
       model.info[count,"MASE"] <- try(accuracy(model$model)[1,"MASE"], silent = TRUE)
       model.info[count,"Shapiro-Wilks"] <- try(shapiro.test(model$model$residuals)$p.value, silent = TRUE)
+      model.info[count,"Ljung-Box"] <- try(Box.test(model$model$residuals, lag = 1, type = "Ljung-Box", fitdf = 0)$p.value, silent = TRUE)
       model.info[count,"Series Used"] <- ts.type[j]
       model.info[count,"Lambda"] <- lambda.array[j]
       model.info[count,"Added Value"] <- added.value.neg[j]
@@ -82,6 +83,7 @@ expSmooth <- function(ts) {
       model.info[count,"ID"] <- count
       model.info[count,"MASE"] <- try(accuracy(model$model)[1,"MASE"], silent = TRUE)
       model.info[count,"Shapiro-Wilks"] <- try(shapiro.test(model$model$residuals)$p.value, silent = TRUE)
+      model.info[count,"Ljung-Box"] <- try(Box.test(model$model$residuals, lag = 1, type = "Ljung-Box", fitdf = 0)$p.value, silent = TRUE)
       model.info[count,"Series Used"] <- ts.type[j]
       model.info[count,"Lambda"] <- lambda.array[j]
       model.info[count,"Added Value"] <- added.value.neg[j]
@@ -98,6 +100,7 @@ expSmooth <- function(ts) {
         model.info[count,"ID"] <- count
         model.info[count,"MASE"] <- try(accuracy(model$model)[1,"MASE"], silent = TRUE)
         model.info[count,"Shapiro-Wilks"] <- try(shapiro.test(model$model$residuals)$p.value, silent = TRUE)
+        model.info[count,"Ljung-Box"] <- try(Box.test(model$model$residuals, lag = 1, type = "Ljung-Box", fitdf = 0)$p.value, silent = TRUE)
         model.info[count,"Series Used"] <- ts.type[j]
         model.info[count,"Lambda"] <- lambda.array[j]
         model.info[count,"Added Value"] <- added.value.pos[j]
@@ -109,6 +112,7 @@ expSmooth <- function(ts) {
         model.info[count,"ID"] <- count
         model.info[count,"MASE"] <- try(accuracy(model$model)[1,"MASE"], silent = TRUE)
         model.info[count,"Shapiro-Wilks"] <- try(shapiro.test(model$model$residuals)$p.value, silent = TRUE)
+        model.info[count,"Ljung-Box"] <- try(Box.test(model$model$residuals, lag = 1, type = "Ljung-Box", fitdf = 0)$p.value, silent = TRUE)
         model.info[count,"Series Used"] <- ts.type[j]
         model.info[count,"Lambda"] <- lambda.array[j]
         model.info[count,"Added Value"] <- added.value.neg[j]
@@ -123,6 +127,7 @@ expSmooth <- function(ts) {
       model.info[count,"ID"] <- count
       model.info[count,"MASE"] <- try(accuracy(model$model)[1,"MASE"], silent = TRUE)
       model.info[count,"Shapiro-Wilks"] <- try(shapiro.test(model$model$residuals)$p.value, silent = TRUE)
+      model.info[count,"Ljung-Box"] <- try(Box.test(model$model$residuals, lag = 1, type = "Ljung-Box", fitdf = 0)$p.value, silent = TRUE)
       model.info[count,"Series Used"] <- ts.type[j]
       model.info[count,"Lambda"] <- lambda.array[j]
       model.info[count,"Added Value"] <- added.value.neg[j]
@@ -144,6 +149,7 @@ expSmooth <- function(ts) {
         model.info[count,"ID"] <- count
         model.info[count,"MASE"] <- try(accuracy(model$model)[1,"MASE"], silent = TRUE)
         model.info[count,"Shapiro-Wilks"] <- try(shapiro.test(model$model$residuals)$p.value, silent = TRUE)
+        model.info[count,"Ljung-Box"] <- try(Box.test(model$model$residuals, lag = 1, type = "Ljung-Box", fitdf = 0)$p.value, silent = TRUE)
         model.info[count,"Series Used"] <- ts.type[j]
         model.info[count,"Lambda"] <- lambda.array[j]
         model.info[count,"Added Value"] <- added.value.pos[j]
@@ -164,6 +170,7 @@ expSmooth <- function(ts) {
         model.info[count,"ID"] <- count
         model.info[count,"MASE"] <- try(accuracy(model)[1,"MASE"], silent = TRUE)
         model.info[count,"Shapiro-Wilks"] <- try(shapiro.test(model$residuals)$p.value, silent = TRUE)
+        model.info[count,"Ljung-Box"] <- try(Box.test(model$residuals, lag = 1, type = "Ljung-Box", fitdf = 0)$p.value, silent = TRUE)
         model.info[count,"Series Used"] <- ts.type[j]
         model.info[count,"Lambda"] <- lambda.array[j]
         model.info[count,"Added Value"] <- added.value.pos[j]
@@ -176,6 +183,7 @@ expSmooth <- function(ts) {
         model.info[count,"ID"] <- count
         model.info[count,"MASE"] <- try(accuracy(model)[1,"MASE"], silent = TRUE)
         model.info[count,"Shapiro-Wilks"] <- try(shapiro.test(model$residuals)$p.value, silent = TRUE)
+        model.info[count,"Ljung-Box"] <- try(Box.test(model$residuals, lag = 1, type = "Ljung-Box", fitdf = 0)$p.value, silent = TRUE)
         model.info[count,"Series Used"] <- ts.type[j]
         model.info[count,"Lambda"] <- lambda.array[j]
         model.info[count,"Added Value"] <- added.value.neg[j]
@@ -198,6 +206,7 @@ expSmooth <- function(ts) {
         model.info[count,"ID"] <- count
         model.info[count,"MASE"] <- try(accuracy(model)[1,"MASE"], silent = TRUE)
         model.info[count,"Shapiro-Wilks"] <- try(shapiro.test(model$residuals)$p.value, silent = TRUE)
+        model.info[count,"Ljung-Box"] <- try(Box.test(model$residuals, lag = 1, type = "Ljung-Box", fitdf = 0)$p.value, silent = TRUE)
         model.info[count,"Series Used"] <- ts.type[j]
         model.info[count,"Lambda"] <- lambda.array[j]
         model.info[count,"Added Value"] <- added.value.pos[j]
@@ -210,6 +219,7 @@ expSmooth <- function(ts) {
         model.info[count,"ID"] <- count
         model.info[count,"MASE"] <- try(accuracy(model)[1,"MASE"], silent = TRUE)
         model.info[count,"Shapiro-Wilks"] <- try(shapiro.test(model$residuals)$p.value, silent = TRUE)
+        model.info[count,"Ljung-Box"] <- try(Box.test(model$residuals, lag = 1, type = "Ljung-Box", fitdf = 0)$p.value, silent = TRUE)
         model.info[count,"Series Used"] <- ts.type[j]
         model.info[count,"Lambda"] <- lambda.array[j]
         model.info[count,"Added Value"] <- added.value.neg[j]
@@ -223,43 +233,37 @@ expSmooth <- function(ts) {
   # formatting array
   model.info <- as.data.frame(model.info)
   model.info <- model.info[complete.cases(model.info),]
-  model.info[, c(1:3,5:6)] <- sapply(model.info[, c(1:3,5:6)], as.character)
-  model.info[, c(1:3,5:6)] <- sapply(model.info[, c(1:3,5:6)], as.numeric)
-  colnames(model.info) <- c("ID","MASE","Shapiro-Wilks","Series Used","Lambda","Added Value")
+  model.info[, c(1:4,6:7)] <- sapply(model.info[, c(1:4,6:7)], as.character)
+  model.info[, c(1:4,6:7)] <- sapply(model.info[, c(1:4,6:7)], as.numeric)
+  colnames(model.info) <- c("ID","MASE","Shapiro-Wilks","Ljung-Box","Series Used","Lambda","Added Value")
   
-  # best MASE model
-  best.MASE.info <- model.info[order(model.info[,"MASE"]),][1,]
+  # models with shapiro & ljung > 0.05
+  good.residuals <- model.info[model.info[,"Shapiro-Wilks"] > 0.05,]
+  good.residuals <- good.residuals[good.residuals[,"Ljung-Box"] > 0.05,]
+  good.residuals <- good.residuals[complete.cases(good.residuals),]
   
-  # models with more than 0.5 shapiro p-value
-  best.residual.models <- model.info[model.info[,"Shapiro-Wilks"] > 0.4,]
-  best.residual.models <- best.residual.models[complete.cases(best.residual.models),]
+  # models with shapiro > 0.05 or ljung > 0.05
+  good.shapiro <- model.info[model.info[,"Shapiro-Wilks"] > 0.05,]
+  good.ljung <- model.info[model.info[,"Ljung-Box"] > 0.05,]
+  good.shapiro <- good.shapiro[complete.cases(good.shapiro),]
+  good.ljung <- good.ljung[complete.cases(good.ljung),]
   
-  # select best shapiro/MASE combo
-  if(nrow(best.residual.models) > 0){
-    best.shapiro.info <- best.residual.models[order(best.residual.models[,"MASE"]),][1,]
+  
+  # select best residual/MASE combo
+  if(nrow(good.residuals) > 0){
+    best.model.info <- good.residuals[order(good.residuals[,"MASE"]),][1,]
+    best.model <- models[[best.model.info[,"ID"]]]
+  }else if(nrow(good.shapiro) > 0){
+    best.model.info <- good.shapiro[order(good.shapiro[,"MASE"]),][1,]
+    best.model <- models[[best.model.info[,"ID"]]]
+  }else if(nrow(good.ljung) > 0){
+    best.model.info <- good.ljung[order(good.ljung[,"MASE"]),][1,]
+    best.model <- models[[best.model.info[,"ID"]]]
   }else{
-    best.shapiro.info <- model.info[order(-model.info[,"Shapiro-Wilks"]),][1,]
+    best.model.info <- model.info[order(model.info[,"MASE"]),][1,]
+    best.model <- models[[best.model.info[,"ID"]]]
   }
   
-  MASE.diff <- best.shapiro.info[,"MASE"] - best.MASE.info[,"MASE"]
-  shapiro.diff <- best.shapiro.info[,"Shapiro-Wilks"] - best.MASE.info[,"Shapiro-Wilks"]
-  
-  if(best.MASE.info[,"Shapiro-Wilks"] > 0.4){
-    best.model <- models[[best.MASE.info[,"ID"]]]
-    best.model.info <- best.MASE.info
-  }else if(best.shapiro.info[,"Shapiro-Wilks"] < 0.05){
-    best.model <- models[[best.MASE.info[,"ID"]]]
-    best.model.info <- best.MASE.info
-  }else if((MASE.diff < 0.05) && (shapiro.diff > 0.5)){
-    best.model <- models[[best.shapiro.info[,"ID"]]]
-    best.model.info <- best.shapiro.info
-  }else if((MASE.diff < 0.02) && (shapiro.diff > 0.1)){
-    best.model <- models[[best.shapiro.info[,"ID"]]]
-    best.model.info <- best.shapiro.info
-  }else{
-    best.model <- models[[best.MASE.info[,"ID"]]]
-    best.model.info <- best.MASE.info
-  }
   
   result <- list(best.model, best.model.info)
   return(result)
