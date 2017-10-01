@@ -8,20 +8,17 @@ yearly <- read.csv("Data/Yearly.csv")
 
 
 #  objects to store results (monthly)
-MASE.monthly <- array()
-shapiro.monthly <- array()
 models.monthly <- list()
 model.info.monthly <- list()
-MASE.frc.monthly <- array()
 forecasts.monthly <- list()
 series95.monthly <- list()
 series05.monthly <- list()
 
 # array to store overall model fitting info
 overall.info <- array(NA,
-                      dim = c(303,9), 
-                      dimnames = list(NULL,c("Series Category","Season Frequency","Model Fitted","Series Used","MASE",
-                                             "Shapiro-Wilks","AIC","AICc","BIC")))
+                      dim = c(303,11), 
+                      dimnames = list(NULL,c("Series Category","Season Frequency","Model Fitted","Series Used",
+                                             "Model MASE","Forecast MASE","Shapiro-Wilks","Ljung-Box","AIC","AICc","BIC")))
 count <- 1
 
 # monthly loop
@@ -57,8 +54,9 @@ for(i in 1:nrow(monthly)){
   fit <- expSmooth(series95.monthly[[i]])
   models.monthly[[i]] <- fit[[1]]
   model.info.monthly[[i]] <- fit[[2]]
-  MASE.monthly[i] <- model.info.monthly[[i]][,"MASE"]
-  shapiro.monthly[i] <- model.info.monthly[[i]][,"Shapiro-Wilks"]
+  overall.info[count,"Model MASE"] <- model.info.monthly[[i]][,"MASE"]
+  overall.info[count,"Shapiro-Wilks"] <- model.info.monthly[[i]][,"Shapiro-Wilks"]
+  overall.info[count,"Ljung-Box"] <- model.info.monthly[[i]][,"Ljung-Box"]
   
   # forecasts
   forecasts.monthly[[i]] <- forecast(models.monthly[[i]], h = length(series05.monthly[[i]]))$mean
@@ -83,15 +81,13 @@ for(i in 1:nrow(monthly)){
     forecasts.monthly[[i]] = window(back.series,start = start(series05.monthly[[i]]))
   }
   
-  MASE.frc.monthly[i] <- as.numeric(MASE.custom(series05.monthly[[i]], forecasts.monthly[[i]]))
+  overall.info[count,"Forecast MASE"] <- as.numeric(MASE.custom(series05.monthly[[i]], forecasts.monthly[[i]]))
   
   # storing overall info 
   overall.info[count,"Series Category"] <- as.character(monthly[i,"Category"])
   overall.info[count,"Season Frequency"] <- freq
   overall.info[count,"Model Fitted"] <- models.monthly[[i]]$method
   overall.info[count,"Series Used"] <- as.character(model.info.monthly[[i]][,"Series Used"])
-  overall.info[count,"MASE"] <- MASE.monthly[i]
-  overall.info[count,"Shapiro-Wilks"] <- shapiro.monthly[i]
   overall.info[count,"AIC"] <- if(grepl("ETS",models.monthly[[i]]$method)){models.monthly[[i]]$aic}else{models.monthly[[i]]$model$aic}
   overall.info[count,"AICc"] <- if(grepl("ETS",models.monthly[[i]]$method)){models.monthly[[i]]$aicc}else{models.monthly[[i]]$model$aicc}
   overall.info[count,"BIC"] <- if(grepl("ETS",models.monthly[[i]]$method)){models.monthly[[i]]$bic}else{models.monthly[[i]]$model$bic}
@@ -99,12 +95,10 @@ for(i in 1:nrow(monthly)){
   count <- count + 1
 }
 
+
 #  objects to store results (quarterly)
-MASE.quarterly <- array()
-shapiro.quarterly <- array()
 models.quarterly <- list()
 model.info.quarterly <- list()
-MASE.frc.quarterly <- array()
 forecasts.quarterly <- list()
 series95.quarterly <- list()
 series05.quarterly <- list()
@@ -114,34 +108,35 @@ freq <- 4
 for(i in 1:nrow(quarterly)){
   if((0.05*quarterly$N[i]<3) && (quarterly[i,quarterly$N[i]+5] == quarterly[i,quarterly$N[i]+6])){
     series95.quarterly[[i]] <- ts(as.vector(t(as.matrix(quarterly[i,7:(quarterly$N[i]+3)]))),
-                   start = c(quarterly$Starting.Year[i], quarterly$Starting.Month[i]),
-                   frequency = freq)
+                                  start = c(quarterly$Starting.Year[i], quarterly$Starting.Month[i]),
+                                  frequency = freq)
     series05.quarterly[[i]] <- ts(as.vector(t(as.matrix(quarterly[i,(quarterly$N[i]+4):(quarterly$N[i]+6)]))),
-                   start=end(series95.quarterly[[i]])+c(0,1), 
-                   frequency = freq)
+                                  start=end(series95.quarterly[[i]])+c(0,1), 
+                                  frequency = freq)
   }else if(0.05*quarterly$N[i]<3){
     series95.quarterly[[i]] <- ts(as.vector(t(as.matrix(quarterly[i,7:(quarterly$N[i]+4)]))),
-                   start = c(quarterly$Starting.Year[i], quarterly$Starting.Quarter[i]),
-                   frequency = freq)
+                                  start = c(quarterly$Starting.Year[i], quarterly$Starting.Quarter[i]),
+                                  frequency = freq)
     series05.quarterly[[i]] <- ts(as.vector(t(as.matrix(quarterly[i,(quarterly$N[i]+5):(quarterly$N[i]+6)]))),
-                   start=end(series95.quarterly[[i]])+c(0,1), 
-                   frequency = freq)
+                                  start=end(series95.quarterly[[i]])+c(0,1), 
+                                  frequency = freq)
   }else{
     series95.quarterly[[i]] <- ts(as.vector(t(as.matrix(quarterly[i,7:(round(0.95*quarterly$N[i])+6)]))),
-                   start=c(quarterly$Starting.Year[i],quarterly$Starting.Quarter[i]), 
-                   frequency = freq)
+                                  start=c(quarterly$Starting.Year[i],quarterly$Starting.Quarter[i]), 
+                                  frequency = freq)
     
     series05.quarterly[[i]] <- ts(as.vector(t(as.matrix(quarterly[i,(round(0.95*quarterly$N[i])+7):(quarterly$N[i]+6)]))),
-                   start=end(series95.quarterly[[i]])+c(0,1), 
-                   frequency = freq)
+                                  start=end(series95.quarterly[[i]])+c(0,1), 
+                                  frequency = freq)
   }
   
   # model fitting
   fit <- expSmooth(series95.quarterly[[i]])
   models.quarterly[[i]] <- fit[[1]]
   model.info.quarterly[[i]] <- fit[[2]]
-  MASE.quarterly[i] <- model.info.quarterly[[i]][,"MASE"]
-  shapiro.quarterly[i] <- model.info.quarterly[[i]][,"Shapiro-Wilks"]
+  overall.info[count,"Model MASE"] <- model.info.quarterly[[i]][,"MASE"]
+  overall.info[count,"Shapiro-Wilks"] <- model.info.quarterly[[i]][,"Shapiro-Wilks"]
+  overall.info[count,"Ljung-Box"] <- model.info.quarterly[[i]][,"Ljung-Box"]
   
   # forecasts
   forecasts.quarterly[[i]] <- forecast(models.quarterly[[i]], h = length(series05.quarterly[[i]]))$mean
@@ -166,15 +161,13 @@ for(i in 1:nrow(quarterly)){
     forecasts.quarterly[[i]] = window(back.series,start = start(series05.quarterly[[i]]))
   }
   
-  MASE.frc.quarterly[i] <- as.numeric(MASE.custom(series05.quarterly[[i]], forecasts.quarterly[[i]]))
+  overall.info[count,"Forecast MASE"] <- as.numeric(MASE.custom(series05.quarterly[[i]], forecasts.quarterly[[i]]))
   
   # storing overall info 
   overall.info[count,"Series Category"] <- as.character(quarterly[i,"Category"])
   overall.info[count,"Season Frequency"] <- freq
   overall.info[count,"Model Fitted"] <- models.quarterly[[i]]$method
   overall.info[count,"Series Used"] <- as.character(model.info.quarterly[[i]][,"Series Used"])
-  overall.info[count,"MASE"] <- MASE.quarterly[i]
-  overall.info[count,"Shapiro-Wilks"] <- shapiro.quarterly[i]
   overall.info[count,"AIC"] <- if(grepl("ETS",models.quarterly[[i]]$method)){models.quarterly[[i]]$aic}else{models.quarterly[[i]]$model$aic}
   overall.info[count,"AICc"] <- if(grepl("ETS",models.quarterly[[i]]$method)){models.quarterly[[i]]$aicc}else{models.quarterly[[i]]$model$aicc}
   overall.info[count,"BIC"] <- if(grepl("ETS",models.quarterly[[i]]$method)){models.quarterly[[i]]$bic}else{models.quarterly[[i]]$model$bic}
@@ -182,12 +175,10 @@ for(i in 1:nrow(quarterly)){
   count <- count + 1
 }
 
+
 #  objects to store results (yearly)
-MASE.yearly <- array()
-shapiro.yearly <- array()
 models.yearly <- list()
 model.info.yearly <- list()
-MASE.frc.yearly <- array()
 forecasts.yearly <- list()
 series95.yearly <- list()
 series05.yearly <- list()
@@ -219,8 +210,9 @@ for(i in 1:nrow(yearly)){
   fit <- expSmooth(series95.yearly[[i]])
   models.yearly[[i]] <- fit[[1]]
   model.info.yearly[[i]] <- fit[[2]]
-  MASE.yearly[i] <- model.info.yearly[[i]][,"MASE"]
-  shapiro.yearly[i] <- model.info.yearly[[i]][,"Shapiro-Wilks"]
+  overall.info[count,"Model MASE"] <- model.info.yearly[[i]][,"MASE"]
+  overall.info[count,"Shapiro-Wilks"] <- model.info.yearly[[i]][,"Shapiro-Wilks"]
+  overall.info[count,"Ljung-Box"] <- model.info.yearly[[i]][,"Ljung-Box"]
   
   # forecasts
   forecasts.yearly[[i]] <- tryCatch(forecast(models.yearly[[i]], h = length(series05.yearly[[i]]))$mean,
@@ -248,15 +240,13 @@ for(i in 1:nrow(yearly)){
     forecasts.yearly[[i]] = window(back.series,start = start(series05.yearly[[i]]))
   }
   
-  MASE.frc.yearly[i] <- as.numeric(MASE.custom(series05.yearly[[i]], forecasts.yearly[[i]]))
+  overall.info[count,"Forecast MASE"] <- as.numeric(MASE.custom(series05.yearly[[i]], forecasts.yearly[[i]]))
   
   # storing overall info 
   overall.info[count,"Series Category"] <- as.character(yearly[i,"Category"])
   overall.info[count,"Season Frequency"] <- freq
   overall.info[count,"Model Fitted"] <- models.yearly[[i]]$method
   overall.info[count,"Series Used"] <- as.character(model.info.yearly[[i]][,"Series Used"])
-  overall.info[count,"MASE"] <- MASE.yearly[i]
-  overall.info[count,"Shapiro-Wilks"] <- shapiro.yearly[i]
   overall.info[count,"AIC"] <- if(grepl("ETS",models.yearly[[i]]$method)){models.yearly[[i]]$aic}else{models.yearly[[i]]$model$aic}
   overall.info[count,"AICc"] <- if(grepl("ETS",models.yearly[[i]]$method)){models.yearly[[i]]$aicc}else{models.yearly[[i]]$model$aicc}
   overall.info[count,"BIC"] <- if(grepl("ETS",models.yearly[[i]]$method)){models.yearly[[i]]$bic}else{models.yearly[[i]]$model$bic}
@@ -266,21 +256,41 @@ for(i in 1:nrow(yearly)){
 
 # Results
 overall.info <- as.data.frame(overall.info)
-overall.info[, c(2,5:9)] <- sapply(overall.info[, c(2,5:9)], as.character)
-overall.info[, c(2,5:9)] <- sapply(overall.info[, c(2,5:9)], as.numeric)
-colnames(overall.info) <- c("Series Category","Season Frequency","Model Fitted","Series Used","MASE",
-                          "Shapiro-Wilks","AIC","AICc","BIC")
+overall.info[, c(2,5:11)] <- sapply(overall.info[, c(2,5:11)], as.character)
+overall.info[, c(2,5:11)] <- sapply(overall.info[, c(2,5:11)], as.numeric)
+colnames(overall.info) <- c("Series Category","Season Frequency","Model Fitted","Series Used","Model MASE",
+                            "Forecast MASE","Shapiro-Wilks","Ljung-Box","AIC","AICc","BIC")
 
-results <- data.frame(matrix(NA, nrow = 3, ncol = 3), row.names = c("Monthly","Quarterly","Yearly"))
-colnames(results) <- c("Mean Model MASE","Mean Forecast MASE","Mean Shapiro")
-results[1,1] <- mean(MASE.monthly)
-results[2,1] <- mean(MASE.quarterly)
-results[3,1] <- mean(MASE.yearly)
-results[1,2] <- mean(MASE.frc.monthly)
-results[2,2] <- mean(MASE.frc.quarterly)
-results[3,2] <- mean(MASE.frc.yearly)
-results[1,3] <- mean(shapiro.monthly)
-results[2,3] <- mean(shapiro.quarterly)
-results[3,3] <- mean(shapiro.yearly)
+# counting non-normal and correlated residuals
+overall.info$`Non-Normal Std Residuals` <- ifelse(overall.info$`Shapiro-Wilks` < 0.05, 1, 0)
+overall.info$`Correlated Std Residuals` <- ifelse(overall.info$`Ljung-Box` < 0.05, 1, 0)
+
+# filtering by series season frequency
+overall.info.monthly <- overall.info[overall.info[,"Season Frequency"] == 12,]
+overall.info.quarterly <- overall.info[overall.info[,"Season Frequency"] == 4,]
+overall.info.yearly <- overall.info[overall.info[,"Season Frequency"] == 1,]
+
+
+results <- data.frame(matrix(NA, nrow = 3, ncol = 6), row.names = c("Monthly","Quarterly","Yearly"))
+colnames(results) <- c("Mean Model MASE","Mean Forecast MASE","Mean Shapiro","Mean Ljung",
+                       "Non-Normal Std Residuals","Correlated Std Residuals")
+results[1,1] <- mean(overall.info.monthly[,"Model MASE"])
+results[2,1] <- mean(overall.info.quarterly[,"Model MASE"])
+results[3,1] <- mean(overall.info.yearly[,"Model MASE"])
+results[1,2] <- mean(overall.info.monthly[,"Forecast MASE"])
+results[2,2] <- mean(overall.info.quarterly[,"Forecast MASE"])
+results[3,2] <- mean(overall.info.yearly[,"Forecast MASE"])
+results[1,3] <- mean(overall.info.monthly[,"Shapiro-Wilks"])
+results[2,3] <- mean(overall.info.quarterly[,"Shapiro-Wilks"])
+results[3,3] <- mean(overall.info.yearly[,"Shapiro-Wilks"])
+results[1,4] <- mean(overall.info.monthly[,"Ljung-Box"])
+results[2,4] <- mean(overall.info.quarterly[,"Ljung-Box"])
+results[3,4] <- mean(overall.info.yearly[,"Ljung-Box"])
+results[1,5] <- mean(sum(overall.info.monthly[,"Non-Normal Std Residuals"]))
+results[2,5] <- mean(sum(overall.info.quarterly[,"Non-Normal Std Residuals"]))
+results[3,5] <- mean(sum(overall.info.yearly[,"Non-Normal Std Residuals"]))
+results[1,6] <- mean(sum(overall.info.monthly[,"Correlated Std Residuals"]))
+results[2,6] <- mean(sum(overall.info.quarterly[,"Correlated Std Residuals"]))
+results[3,6] <- mean(sum(overall.info.quarterly[,"Correlated Std Residuals"]))
 
 
