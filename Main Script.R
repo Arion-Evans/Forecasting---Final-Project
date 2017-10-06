@@ -13,6 +13,7 @@ model.info.monthly <- list()
 forecasts.monthly <- list()
 series95.monthly <- list()
 series05.monthly <- list()
+fitted.monthly <- list()
 
 # array to store overall model fitting info
 overall.info <- array(NA,
@@ -54,6 +55,7 @@ for(i in 1:nrow(monthly)){
   fit <- expSmooth(series95.monthly[[i]])
   models.monthly[[i]] <- fit[[1]]
   model.info.monthly[[i]] <- fit[[2]]
+  fitted.monthly[[i]] <- models.monthly[[i]]$fitted
   overall.info[count,"Model MASE"] <- model.info.monthly[[i]][,"MASE"]
   overall.info[count,"Shapiro-Wilks"] <- model.info.monthly[[i]][,"Shapiro-Wilks"]
   overall.info[count,"Ljung-Box"] <- model.info.monthly[[i]][,"Ljung-Box"]
@@ -63,25 +65,33 @@ for(i in 1:nrow(monthly)){
   
   # reversing transformations
   if(model.info.monthly[[i]][,"Series Used"] == "Original"){
+    fitted.monthly[[i]] <- fitted.monthly[[i]] - model.info.monthly[[i]][,"Added Value"]
     forecasts.monthly[[i]] <- forecasts.monthly[[i]] - model.info.monthly[[i]][,"Added Value"]
   }
   if(model.info.monthly[[i]][,"Series Used"] == "Box-Cox"){
+    fitted.monthly[[i]] <- invBoxCox(fitted.monthly[[i]], model.info.monthly[[i]][,"Lambda"]) - model.info.monthly[[i]][,"Added Value"]
     forecasts.monthly[[i]] <- invBoxCox(forecasts.monthly[[i]], model.info.monthly[[i]][,"Lambda"]) - model.info.monthly[[i]][,"Added Value"]
   }
   if(model.info.monthly[[i]][,"Series Used"] == "1st Difference"){
+    fitted.monthly[[i]] <- diffinv(fitted.monthly[[i]], xi = series95.monthly[[i]][1], lag = 1)
+    
     comb <- ts.union(diff(series95.monthly[[i]]) , forecasts.monthly[[i]] - model.info.monthly[[i]][,"Added Value"])
     ts.combined.diff  = pmin(comb[,1], comb[,2], na.rm = TRUE)
     back.series = diffinv(ts.combined.diff, xi = series95.monthly[[i]][1],lag = 1)
     forecasts.monthly[[i]] = window(back.series,start = start(series05.monthly[[i]]))
   }
   if(model.info.monthly[[i]][,"Series Used"] == "Seasonal Difference"){
+    fitted.monthly[[i]] <- diffinv(fitted.monthly[[i]], xi = series95.monthly[[i]][1:freq],lag = freq)
+    
     comb <- ts.union(diff(series95.monthly[[i]], lag = freq) , forecasts.monthly[[i]] - model.info.monthly[[i]][,"Added Value"])
     ts.combined.diff  = pmin(comb[,1], comb[,2], na.rm = TRUE)
     back.series = diffinv(ts.combined.diff, xi = series95.monthly[[i]][1:freq],lag = freq)
     forecasts.monthly[[i]] = window(back.series,start = start(series05.monthly[[i]]))
   }
   
-  overall.info[count,"Forecast MASE"] <- as.numeric(MASE.custom(series05.monthly[[i]], forecasts.monthly[[i]]))
+  overall.info[count,"Forecast MASE"] <- as.numeric(MASE.custom(as.vector(fitted.monthly[[i]]),
+                                                                as.vector(series05.monthly[[i]]), 
+                                                                as.vector(forecasts.monthly[[i]])))
   
   # storing overall info 
   overall.info[count,"Series Category"] <- as.character(monthly[i,"Category"])
@@ -102,6 +112,7 @@ model.info.quarterly <- list()
 forecasts.quarterly <- list()
 series95.quarterly <- list()
 series05.quarterly <- list()
+fitted.quarterly <- list()
 
 # quarterly loop
 freq <- 4
@@ -134,6 +145,7 @@ for(i in 1:nrow(quarterly)){
   fit <- expSmooth(series95.quarterly[[i]])
   models.quarterly[[i]] <- fit[[1]]
   model.info.quarterly[[i]] <- fit[[2]]
+  fitted.quarterly[[i]] <- models.quarterly[[i]]$fitted
   overall.info[count,"Model MASE"] <- model.info.quarterly[[i]][,"MASE"]
   overall.info[count,"Shapiro-Wilks"] <- model.info.quarterly[[i]][,"Shapiro-Wilks"]
   overall.info[count,"Ljung-Box"] <- model.info.quarterly[[i]][,"Ljung-Box"]
@@ -143,25 +155,33 @@ for(i in 1:nrow(quarterly)){
   
   # reversing transformations
   if(model.info.quarterly[[i]][,"Series Used"] == "Original"){
+    fitted.quarterly[[i]] <- fitted.quarterly[[i]] - model.info.quarterly[[i]][,"Added Value"]
     forecasts.quarterly[[i]] <- forecasts.quarterly[[i]] - model.info.quarterly[[i]][,"Added Value"]
   }
   if(model.info.quarterly[[i]][,"Series Used"] == "Box-Cox"){
+    fitted.quarterly[[i]] <- invBoxCox(fitted.quarterly[[i]], model.info.quarterly[[i]][,"Lambda"]) - model.info.quarterly[[i]][,"Added Value"]
     forecasts.quarterly[[i]] <- invBoxCox(forecasts.quarterly[[i]], model.info.quarterly[[i]][,"Lambda"]) - model.info.quarterly[[i]][,"Added Value"]
   }
   if(model.info.quarterly[[i]][,"Series Used"] == "1st Difference"){
+    fitted.quarterly[[i]] <- diffinv(fitted.quarterly[[i]], xi = series95.quarterly[[i]][1], lag = 1)
+    
     comb <- ts.union(diff(series95.quarterly[[i]]) , forecasts.quarterly[[i]] - model.info.quarterly[[i]][,"Added Value"])
     ts.combined.diff  = pmin(comb[,1], comb[,2], na.rm = TRUE)
     back.series = diffinv(ts.combined.diff, xi = series95.quarterly[[i]][1],lag = 1)
     forecasts.quarterly[[i]] = window(back.series,start = start(series05.quarterly[[i]]))
   }
   if(model.info.quarterly[[i]][,"Series Used"] == "Seasonal Difference"){
+    fitted.quarterly[[i]] <- diffinv(fitted.quarterly[[i]], xi = series95.quarterly[[i]][1:freq],lag = freq)
+    
     comb <- ts.union(diff(series95.quarterly[[i]], lag = freq) , forecasts.quarterly[[i]] - model.info.quarterly[[i]][,"Added Value"])
     ts.combined.diff  = pmin(comb[,1], comb[,2], na.rm = TRUE)
     back.series = diffinv(ts.combined.diff, xi = series95.quarterly[[i]][1:freq],lag = freq)
     forecasts.quarterly[[i]] = window(back.series,start = start(series05.quarterly[[i]]))
   }
   
-  overall.info[count,"Forecast MASE"] <- as.numeric(MASE.custom(series05.quarterly[[i]], forecasts.quarterly[[i]]))
+  overall.info[count,"Forecast MASE"] <- as.numeric(MASE.custom(as.vector(fitted.quarterly[[i]]),
+                                                                as.vector(series05.quarterly[[i]]), 
+                                                                as.vector(forecasts.quarterly[[i]])))
   
   # storing overall info 
   overall.info[count,"Series Category"] <- as.character(quarterly[i,"Category"])
@@ -182,6 +202,7 @@ model.info.yearly <- list()
 forecasts.yearly <- list()
 series95.yearly <- list()
 series05.yearly <- list()
+fitted.yearly <- list()
 
 # yearly loop
 freq = 1
@@ -210,6 +231,7 @@ for(i in 1:nrow(yearly)){
   fit <- expSmooth(series95.yearly[[i]])
   models.yearly[[i]] <- fit[[1]]
   model.info.yearly[[i]] <- fit[[2]]
+  fitted.yearly[[i]] <- models.yearly[[i]]$fitted
   overall.info[count,"Model MASE"] <- model.info.yearly[[i]][,"MASE"]
   overall.info[count,"Shapiro-Wilks"] <- model.info.yearly[[i]][,"Shapiro-Wilks"]
   overall.info[count,"Ljung-Box"] <- model.info.yearly[[i]][,"Ljung-Box"]
@@ -222,25 +244,33 @@ for(i in 1:nrow(yearly)){
   
   # reversing transformations
   if(model.info.yearly[[i]][,"Series Used"] == "Original"){
+    fitted.yearly[[i]] <- fitted.yearly[[i]] - model.info.yearly[[i]][,"Added Value"]
     forecasts.yearly[[i]] <- forecasts.yearly[[i]] - model.info.yearly[[i]][,"Added Value"]
   }
   if(model.info.yearly[[i]][,"Series Used"] == "Box-Cox"){
+    fitted.yearly[[i]] <- invBoxCox(fitted.yearly[[i]], model.info.yearly[[i]][,"Lambda"]) - model.info.yearly[[i]][,"Added Value"]
     forecasts.yearly[[i]] <- invBoxCox(forecasts.yearly[[i]], model.info.yearly[[i]][,"Lambda"]) - model.info.yearly[[i]][,"Added Value"]
   }
   if(model.info.yearly[[i]][,"Series Used"] == "1st Difference"){
+    fitted.yearly[[i]] <- diffinv(fitted.yearly[[i]], xi = series95.yearly[[i]][1], lag = 1)
+    
     comb <- ts.union(diff(series95.yearly[[i]]) , forecasts.yearly[[i]] - model.info.yearly[[i]][,"Added Value"])
     ts.combined.diff  = pmin(comb[,1], comb[,2], na.rm = TRUE)
     back.series = diffinv(ts.combined.diff, xi = series95.yearly[[i]][1],lag = 1)
     forecasts.yearly[[i]] = window(back.series,start = start(series05.yearly[[i]]))
   }
   if(model.info.yearly[[i]][,"Series Used"] == "Seasonal Difference"){
+    fitted.yearly[[i]] <- diffinv(fitted.yearly[[i]], xi = series95.yearly[[i]][1:freq],lag = freq)
+    
     comb <- ts.union(diff(series95.yearly[[i]], lag = freq) , forecasts.yearly[[i]] - model.info.yearly[[i]][,"Added Value"])
     ts.combined.diff  = pmin(comb[,1], comb[,2], na.rm = TRUE)
     back.series = diffinv(ts.combined.diff, xi = series95.yearly[[i]][1:freq],lag = freq)
     forecasts.yearly[[i]] = window(back.series,start = start(series05.yearly[[i]]))
   }
   
-  overall.info[count,"Forecast MASE"] <- as.numeric(MASE.custom(series05.yearly[[i]], forecasts.yearly[[i]]))
+  overall.info[count,"Forecast MASE"] <- as.numeric(MASE.custom(as.vector(fitted.yearly[[i]]),
+                                                                as.vector(series05.yearly[[i]]), 
+                                                                as.vector(forecasts.yearly[[i]])))
   
   # storing overall info 
   overall.info[count,"Series Category"] <- as.character(yearly[i,"Category"])
