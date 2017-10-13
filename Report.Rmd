@@ -1,5 +1,6 @@
 ---
 title: "MATH1307 - Forecasting Assignment 3"
+author: "Arion Barzoucas-Evans (s3650046),Rahul Kumar Gupta (s3635232), Sayoni Biswas (s3634357)"
 output:
   pdf_document:
     fig_caption: true
@@ -95,8 +96,8 @@ ggplot(models.info,aes(x=`Model Fitted`,y=`Freq`)) +
   labs(subtitle = 'Data from 303 times series',
        caption="Source - International Institute of Forecasters") +
   theme_minimal() +
-  theme(plot.caption = element_text(size = 9,color = '#666666',face = "italic"),
-        plot.subtitle = element_text(color = '#333333',face = "italic")) 
+  theme(plot.caption = element_text(size = 8, color = '#666666', face = "italic"),
+        plot.subtitle = element_text(size = 9, color = '#333333', face = "italic")) 
 ```
 
 \newpage
@@ -141,8 +142,8 @@ ggplot(models.seasonal,aes(x=`Season Frequency`,y=`Freq`, fill=`Model Fitted`)) 
   labs(subtitle = '(M,Md,N) Model for Yearly, (A,Ad,A) and (M,Md,N) in Quarterly, (A,Ad,A) for Monthly are Highest',
        caption="Source - International Institute of Forecasters") +
   theme_minimal() +
-  theme(plot.caption = element_text(size = 9,color = '#666666',face = "italic"),
-        plot.subtitle = element_text(color = '#333333',face = "italic")) 
+  theme(plot.caption = element_text(size = 8, color = '#666666', face = "italic"),
+        plot.subtitle = element_text(size = 9, color = '#333333', face = "italic")) 
 ```
 
 \newpage
@@ -223,8 +224,8 @@ ggplot(data = overall.info.2, aes(y = `Model MASE`)) +
                         '\nHowever, yearly series MASE is always high'),
        caption="Source - International Institute of Forecasters") +
   theme_minimal() +
-  theme(plot.caption = element_text(size = 9,color = '#666666',face = "italic"),
-        plot.subtitle = element_text(size = 9, color = '#333333',face = "italic")) 
+  theme(plot.caption = element_text(size = 8, color = '#666666', face = "italic"),
+        plot.subtitle = element_text(size = 9, color = '#333333', face = "italic")) 
 ```
 
 \newpage
@@ -250,8 +251,8 @@ ggplot(lm.data, aes(x = Observed, y = Forecast)) +
   labs(subtitle = 'Forecasts are fitted well for the series',
        caption="Source - International Institute of Forecasters") +
   theme_grey() +
-  theme(plot.caption = element_text(size = 9,color = '#666666',face = "italic"),
-        plot.subtitle = element_text(color = '#333333',face = "italic"))  
+  theme(plot.caption = element_text(size = 8, color = '#666666', face = "italic"),
+        plot.subtitle = element_text(size = 9, color = '#333333', face = "italic"))  
 ```
 
 \newpage
@@ -271,8 +272,20 @@ kable(model.summary[,1:5], caption="\\label{tab:summary1}Time series Mean Summar
 kable(model.summary[,c(1,6:7)] , caption="\\label{tab:summary2}Time series Residual Count")
 ```
 
+By examining Table \ref{tab:summary1} and \ref{tab:summary2}, it can be inferred that monthly series has the smallest MASE value of 0.343, mean forecast MASE of 1.916, mean shapiro of 0.25, mean Ljung of 0.594, non normal standard residuals are 14, while the correlated standard residuals are 5. Monthly series has the most number of models with non normal and correlated standard residuals. 
+
+While the quaterly series has the smallest MASE value of 0.379, mean forecast MASE of 43.47, mean shapiro of 0.318, mean Ljung of 0.638, non normal standard residuals are 2, while the correlated standard residuals are 1.
+
+The yearly series on the other hand has the  MASE value of 0.634, mean forecast MASE of 48.89, mean shapiro of 0.376, mean Ljung of 0.566, non normal standard residuals are 3, while the correlated standard residuals are 1.This might be due to the generally smaller length of the yearly series.
+
+Yearly models have the highest MASE values in all categories. Monthly series has overall low MASE values. 
+75% of MASE values are below 0.5. The monthly and quaterly forecasts are slightly accurate than the yearly forecast with less variation.
+
 ## Conclusion
 
+Random Forest mechanism with exponential smoothing and state space models is used to forecast M3 time series, which has produced interesting results. Model selection with MASE, AIC, BIC, Shapiro-Wilks, Ljung-Box and residual analysis ensure the accuracy on selection. 
+
+The study is limited to point forecast with least MASE scaled error. The reusable function can be used for other sets of time series with minor modifications. The algorithm calculation time can be optimized further. 
 
 # Appendix
 
@@ -285,9 +298,9 @@ library(forecast)
 source('Functions.R')
 
 # read data
-monthly <- read.csv("Data/Monthly.csv")
-quarterly <- read.csv("Data/Quarterly.csv")
-yearly <- read.csv("Data/Yearly.csv")   
+monthly <- read_csv("~/Monthly.csv")
+quarterly <- read_csv("~/Quarterly.csv")
+yearly <- read_csv("~/Yearly.csv")  
 
 #  objects to store results (monthly)
 models.monthly <- list()
