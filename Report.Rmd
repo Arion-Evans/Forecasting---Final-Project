@@ -1,5 +1,5 @@
 ---
-title: "MATH1307 - Forecasting Assignment 3"
+title: "MATH1307 - Forecasting Final Project"
 author: "Arion Barzoucas-Evans (s3650046),Rahul Kumar Gupta (s3635232), Sayoni Biswas (s3634357)"
 output:
   pdf_document:
@@ -20,45 +20,48 @@ bibliography: references.bib
 
 ```{r global_options, include=FALSE}
 library(knitr)
+library(readr)
+library(dplyr)
 opts_chunk$set(warning=FALSE, message=FALSE, echo=FALSE)
 ```
 
 
 # Introduction
-International Institute of Forecasters runs M - Competitions [@M3] to forecast multiple time series. The original data has 3003 time series of monthly, quarterly and yearly data which are further categorized into demographic, finance, industry, macroeconomic and micro economic. A subset of M3 with 303 time series is used to forecast from exponential smoothening models and state space models [@HyndmanRobJ2008FwES]. 
+The International Institute of Forecasters runs M - Competitions [@M3] to analyse multiple time series and produce accurate forecasts. The original data has 3003 time series of monthly, quarterly and yearly data which are further categorised into demographic, finance, industry, macroeconomic and microeconomic. A subset of the M3 data with 303 time series was examined in this report and forecasts from exponential smoothing and state space models were produced [@HyndmanRobJ2008FwES]. 
 
-The task was to find the best model in the respective monthly, quarterly and yearly series along with the lowest MASE values while minimizing the non-normal and correlated standardized residuals. The allowable combinations of the models have been put to function with optimal criteria and bounds. For all the models MASE value, Shapiro-Wilks test p value, LJung-Box test p value has been recorded. Three selection criteria were made: first, where both shapiro and LJung p values were greater than 0.05, second, where only shapiro p value was greater than 0.05 and third, where LJung Box test p value was greater than 0.05. All models go through this algorithm and then forecasts are produced are selected with the selected model and transformed back to original scale if necessary. MASE is calculated with the remaining 5% of the series.
+# Methods
+The task was to fit the best model in terms of MASE to 95% of each series from the monthly, quarterly and yearly data respectively while minimizing the number of non-normal and correlated standardized residuals. For each time series, approximately 1200 models were fitted to the original, Box-Cox transformed, differenced, and seasonally differenced series by trying all allowable model combinations and changing the optimisation criteria for parameter selection. For all fitted models, the MASE value, the Shapiro-Wilks Box test p value, and the LJung-Box test p value were recorded. The candidate models were then separated into 3 groups: 
 
-# Forecasting
-\vspace{12pt}
+1. Models with both Shapiro and LJung p values greater than 0.05
 
-Following steps are used to get the best fitting model:
+2. Models with only Shapiro p value greater than 0.05
 
-* Time-series are divided into 3 parts i.e. Monthly, quarterly and Yearly. It is split into 95% training set and 5% test set.
+3. Models with only LJung Box test p value greater than 0.05
 
-* Each time series goes approximately 1200 combination of model in state space exponential smoothing. Parameters, MASE, AIC, BIC, residuals, and auditing data is collected during the process.
+After this separation, the final model to be fitted was selected in the following way: 
 
-* The model if fit for original, transformed, first ordinary and seasonal differenced series. These series are fitted according to exponential, damped, bounds and optimization criteria.
+* If the first list of models is non-empty, the model with the lowest MASE value from the list is selected
 
-* Best model is considered using values obtained by MASE, Shapiro, and Ljung-box. Residuals are considered if the selected model is good or bad. In case, all the selected model for specific time series has significant serial correlation with very low p value, lowest MASE model is considered as best model.
+* If the first list is empty and one or both of the remaining lists are non-empty, the model with the lowest MASE value from one of the non-empty lists is selected
 
-All series has been run using the above process. Below are the analysis from M3 Data forecasting.
+* If all lists are empty, simply select the model with the overall lowest MASE value from all 1200 candidate models
+
+This model selection algorithm thus ensures the minimum number of non-normal and correlated standardized residuals for each model while at the same time minimizing its MASE value. The algorithm was applied to all time series, forecasts were produced with the selected model and transformed back to their original scale if necessary. Forecast MASE was then calculated using the remaining 5% of the series and the model's fitted values.
+
 
 ## Analysis
 
 ### Flow Chart
 
-![Flow diagram of Time Series models](Sankey.jpg)
+![Flow Diagram of the Time Series Models](Sankey.jpg)
 
-The following Sankey diagram shows the proportion of flow in model selection. Models fitted to the original series have performed better. First difference is rarely used for monthly and quarterly series, instead Box-Cox and seasonal difference is preferred. However, yearly models have been fitted using the first differenced series. The state space model with Multiplicative error, multiplicative damped trend and no seasonality is the most fitted, preferred with micro economic data.
+The Sankey diagram above shows the flow of the model selection process. Models fitted to the original series have generally performed better. First difference is rarely used for monthly and quarterly series, instead Box-Cox and seasonal difference is preferred. However, a significant number of yearly models have been fitted using the first differenced series. The state space model with multiplicative errors, multiplicative damped trend and no seasonality is the most fitted, especially with micro economic data.
 
 \pagebreak
 
 ### Fitted Models
 
-Figure \ref{fig:fitted-model} shows the list of all exponential and state space model models among time series. Model with Multiplicative error, multiplicative damped trend and no seasonality is the most fitted, followed by additive error, additive damped trend and no seasonality model. Exponential smoothing are the most uncommon with count less than 10 each. 
-
-Top 5 models contribute more than 50% of all fitted models. 
+Figure \ref{fig:fitted-model} shows the list of all exponential and state space models fitted to all time series. The model with multiplicative errors, multiplicative damped trend and no seasonality is the most fitted, followed by the model with additive errors, additive damped trend and no seasonality. The Holt and Holt-Winters models are generally the least common with each model being fitted less than 5 times (apart from the Damped Holt-Winters Multiplicative Exponential model). It is observed that the top 5 models were fitted to more than half of the time series. 
 
 ```{r, fig.height=6, fig.width=7, fig.cap=paste("\\label{fig:fitted-model}Frequency of fitted models")}
 #Load Libraries
@@ -104,9 +107,9 @@ ggplot(models.info,aes(x=`Model Fitted`,y=`Freq`)) +
 
 ### Top 5 Fitted Models by series Type
 
-Figure \ref{fig:fitted-season} illustrates top 5 fitted models by seasonalty. For the quarterly model multiplicative error, multiplicative damped trend and multiplicative seasonality has been fitted the most followed by additive error, additive damped trend and no seasonality model.
+Figure \ref{fig:fitted-season} illustrates the top 5 fitted models by seasonalty. For the quarterly series, the state-space model with multiplicative errors, multiplicative damped trend and multiplicative seasonality has been fitted the most followed by the model with additive errors, additive damped trend and no seasonality.
 
-For the monthly model additive error, additive damped trend and additive seasonality is the most fitted followed by additive error, additive damped trend and no seasonality model.
+For the monthly series, the model with additive errors, additive damped trend and additive seasonality is the most fitted followed by the model with additive errors, additive damped trend and no seasonality.
 
 \vspace{12pt}
 
@@ -139,7 +142,7 @@ ggplot(models.seasonal,aes(x=`Season Frequency`,y=`Freq`, fill=`Model Fitted`)) 
   ggtitle('Top 5 fitted models according to Series Frequency') +
   xlab('') +
   ylab('Frequency of Models') +
-  labs(subtitle = '(M,Md,N) Model for Yearly, (A,Ad,A) and (M,Md,N) in Quarterly, (A,Ad,A) for Monthly are Highest',
+  labs(subtitle = '(M,Md,N) Model for Yearly, (A,Ad,A) and (M,Md,M) in Quarterly, (A,Ad,A) for Monthly are highest',
        caption="Source - International Institute of Forecasters") +
   theme_minimal() +
   theme(plot.caption = element_text(size = 8, color = '#666666', face = "italic"),
@@ -150,9 +153,7 @@ ggplot(models.seasonal,aes(x=`Season Frequency`,y=`Freq`, fill=`Model Fitted`)) 
 
 ### Distribution of MASE
 
-Figure \ref{fig:MASE-hist} shows the MASE distribution in Monthly, Quarterly and Yearly data. In quarterly series, distribution is bi-model. Few outliers with high values has shifted mean value towards center. 
-
-Quarterly series is little right skewed and distribution is around mean level. Yearly MASE is negatively skewed and has no outliers.
+Figure \ref{fig:MASE-hist} shows the distribution of MASE values in the monthly, quarterly and yearly series. In the monthly series, the distribution is bi-modal with most values falling between 0.05 and 0.25 and also between 0.5 and 0.65. Several outliers with high MASE values have shifted the mean value to the right. On the other hand, the distribution for the quarterly series is closer to that of a normal distribution with a right tail. This tail is once again pulling the mean MASE value towards higher values. Finally, the MASE values for the yearly series have a negatively skewed distribution with the mean value being displaced towards lower values.
 
 \vspace{12pt}
 
@@ -210,7 +211,7 @@ cow
 
 \newpage
 
-The next Figure \ref{fig:MASE-box} shows the MASE distribution in different categories. Monthly Series has lowest MASE in almost all categories, while yearly has highest MASE near 1. Micro series has lowest interquartile range in all data types.
+Figure \ref{fig:MASE-box} shows the MASE value distribution in the different data categories. The monthly series have the lowest MASE in almost all categories, while the yearly series have highest MASE in every category. This may be an effect of the generally small number of observations available in each yearly time series. The best overall model perfomance in terms of MASE is seen in macroeconomic data with the majority of MASE values from all time series being less than 0.5.
 
 \vspace{12pt}
 
@@ -220,7 +221,7 @@ ggplot(data = overall.info.2, aes(y = `Model MASE`)) +
   scale_fill_brewer(palette = 'Pastel1') +
   labs(fill = "Seasonality", title = "Model MASE by Series Category & Seasonality") +
   theme_minimal() +
-  labs(subtitle = paste('Monthly Series has the lowest MASE in Most of the category',
+  labs(subtitle = paste('Monthly series have the lowest MASE in most categories',
                         '\nHowever, yearly series MASE is always high'),
        caption="Source - International Institute of Forecasters") +
   theme_minimal() +
@@ -232,7 +233,7 @@ ggplot(data = overall.info.2, aes(y = `Model MASE`)) +
 
 ### Results
 
-The scatter plot from figure \ref{fig:model.accuracy} shows 1 step ahead forecast with actual observed values by seasonality. All the models has fitted well with the observed series. Linear regression model is significant with around 0.9 R-Squared value for monthly, quarterly and yearly.
+The scatter plot in Figure \ref{fig:model.accuracy} displays 1 step ahead forecasts with actual observed values by seasonality. Ideally, the forecasts would fall on the x=y line (e.g forecasts are equal to observed value). According to the graph, this is true for all series with data points converging to the x=y line. However, as expected, forecasts for the yearly series perform slightly worse than for the quarterly and monthly series.
 
 \vspace{12pt}
 
@@ -266,26 +267,30 @@ model.summary = overall.info.2 %>%
             'Mean Shapiro'=mean(`Shapiro-Wilks`),
             'Mean Ljung'=mean(`Ljung-Box`),
             'Non-Normal Std Residuals' = sum(`Non-Normal Std Residuals`),
-            'Correlated Std Residuals' = sum(`Correlated Std Residuals`)) %>%
+            'Correlated Std Residuals' = sum(`Correlated Std Residuals`),
+            'Mean AIC' = mean(AIC),
+            'Mean AICc' = mean(AICc),
+            'Mean BIC' = mean(BIC)) %>%
   arrange(`Mean Model MASE`)
-kable(model.summary[,1:5], caption="\\label{tab:summary1}Time series Mean Summary")
-kable(model.summary[,c(1,6:7)] , caption="\\label{tab:summary2}Time series Residual Count")
+kable(model.summary[,1:5], caption="\\label{tab:summary1}Time Series Model Mean Summary")
+kable(model.summary[,c(1,6:7)] , caption="\\label{tab:summary2}Time Series Model Residual Count")
+kable(model.summary[,c(1,8:10)] , caption="\\label{tab:summary3}Time Series Model Information Criteria")
+
 ```
 
-By examining Table \ref{tab:summary1} and \ref{tab:summary2}, it can be inferred that monthly series has the smallest MASE value of 0.343, mean forecast MASE of 1.916, mean shapiro of 0.25, mean Ljung of 0.594, non normal standard residuals are 14, while the correlated standard residuals are 5. Monthly series has the most number of models with non normal and correlated standard residuals. 
+By examining Table \ref{tab:summary1} and \ref{tab:summary2}, it can be inferred that models for the monthly series have the smallest MASE value of 0.343, mean forecast MASE of 1.557, mean Shapiro of 0.25, mean Ljung of 0.594, 14 non-normal standardized residuals, and 5 correlated standardized residuals. So, even though they have the smallest mean MASE value, models for the monthly series have the largest number of models with non-normal and correlated standardized residuals. 
 
-While the quaterly series has the smallest MASE value of 0.379, mean forecast MASE of 43.47, mean shapiro of 0.318, mean Ljung of 0.638, non normal standard residuals are 2, while the correlated standard residuals are 1.
+Similar results are observed for the models of the quaterly series with a mean MASE value of 0.379, mean forecast MASE of 1.22, mean Shapiro of 0.318, mean Ljung of 0.638, 2 non-normal standardized residuals, and 1 model with correlated standardized residuals. This means that the quarterly series models have the lowest mean forecast MASE value and also the smallest number of models with non-normal and correlated standardized residuals.
 
-The yearly series on the other hand has the  MASE value of 0.634, mean forecast MASE of 48.89, mean shapiro of 0.376, mean Ljung of 0.566, non normal standard residuals are 3, while the correlated standard residuals are 1.This might be due to the generally smaller length of the yearly series.
+The yearly series on the other hand has the  MASE value of 0.634, mean forecast MASE of 1.73, mean Shapiro of 0.376, mean Ljung of 0.566, 3 models with non-normal standardized residuals, and 1 model with correlated standardized residuals. These results fall in line with our previous observations regarding the yearly series. 
 
-Yearly models have the highest MASE values in all categories. Monthly series has overall low MASE values. 
-75% of MASE values are below 0.5. The monthly and quaterly forecasts are slightly accurate than the yearly forecast with less variation.
+Interestingly, in terms of model information criteria (\ref{tab:summary3}), the models for the monthly series have the highest mean AIC, AICc, and BIC values followed by the quarterly series and finally the yearly series with the lowest values.
+
 
 ## Conclusion
 
-Random Forest mechanism with exponential smoothing and state space models is used to forecast M3 time series, which has produced interesting results. Model selection with MASE, AIC, BIC, Shapiro-Wilks, Ljung-Box and residual analysis ensure the accuracy on selection. 
+Exponential smoothing and state space models were used to forecast 303 M3 time series, which has produced interesting results. Models for the monthly series had the best performance in terms of MASE values, models for the quarterly series appeared to have the best performance in terms of forecast accuracy (lowest forecast MASE value), and finally the models for the yearly time series had the lowest values of AIC, AICc, and BIC. 
 
-The study is limited to point forecast with least MASE scaled error. The reusable function can be used for other sets of time series with minor modifications. The algorithm calculation time can be optimized further. 
 
 # Appendix
 
